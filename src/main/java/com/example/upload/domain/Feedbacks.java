@@ -1,8 +1,10 @@
 package com.example.upload.domain;
 
-import com.example.upload.BaseTimeEntity;
+
+import com.example.upload.FeedbackTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,7 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Data
-public class Feedback extends BaseTimeEntity {
+public class Feedback extends FeedbackTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "feedback_id")
@@ -22,6 +24,7 @@ public class Feedback extends BaseTimeEntity {
     private Board board;
 
     private String comment;
+
     //연관관계 편의 메소드
     public void confirmBoard(Board board){
         this.board=board;
@@ -31,5 +34,12 @@ public class Feedback extends BaseTimeEntity {
     // comment 필드의 getter 메서드 정의
     public String getComment() {
         return comment;
+    }
+
+    @Builder
+    public Feedback(Long id, Board board,String comment){
+        this.id=id;
+        this.board = board;
+        this.comment=comment;
     }
 }
