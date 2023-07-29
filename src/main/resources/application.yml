@@ -1,0 +1,43 @@
+
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  jpa: #???? 2?
+    hibernate: #???? 4?
+      ddl-auto: create #???? 6?
+    properties: #???? 4?
+      hibernate: #???? 6?
+        # show_sql: true #???? 8?
+        format_sql: true #???? 8?
+
+  mvc:
+    hidden-method:
+      filter:
+        enabled: true
+
+  devtools:
+    livereload:
+      enabled: true
+    thymeleaf:
+      cache: false
+    restart:
+      enable: false #????? ??
+
+logging:
+  level: #???? ??
+    org.hibernate.SQL: debug #???? 2?
+
+
+
+
