@@ -1,6 +1,6 @@
-package com.example.extendablechattingbe.common.code;
+package com.example.upload.common;
 
-import com.example.extendablechattingbe.common.response.ResponseCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

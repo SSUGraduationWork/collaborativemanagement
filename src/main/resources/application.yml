@@ -1,12 +1,14 @@
 
 spring:
+  sql:
+    init:
+      platform: mysql
+
   datasource:
-    url: jdbc:h2:tcp://localhost/~/test
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-
-
+    url: jdbc:mysql://serverdb.cafcib2vatvt.us-east-1.rds.amazonaws.com/co_work?autoReconnect=true&setTimezone=Asia/Seoul # 변경해주세요
+    username: admin # Database ID
+    password: dbsgpp00! # Database Password
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   servlet:
     multipart:
@@ -15,11 +17,16 @@ spring:
 
   jpa: #???? 2?
     hibernate: #???? 4?
-      ddl-auto: create #???? 6?
+      ddl-auto: none #???? 6?
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties: #???? 4?
       hibernate: #???? 6?
         # show_sql: true #???? 8?
         format_sql: true #???? 8?
+
+        globally_quoted_identifiers: true
+
 
   mvc:
     hidden-method:

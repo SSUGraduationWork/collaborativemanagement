@@ -1,4 +1,4 @@
-package com.example.extendablechattingbe.common.response;
+package com.example.upload.common;
 
 public interface ResponseCode {
     int getCode();

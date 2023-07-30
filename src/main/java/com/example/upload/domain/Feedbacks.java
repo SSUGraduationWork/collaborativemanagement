@@ -2,33 +2,50 @@ package com.example.upload.domain;
 
 
 import com.example.upload.FeedbackTimeEntity;
+import com.example.upload.Repository.MemberRepository;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
+@Entity(name="Feedbacks")
 @Data
-public class Feedback extends FeedbackTimeEntity {
+@EqualsAndHashCode(callSuper = false)
+public class Feedbacks extends FeedbackTimeEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "feedback_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    private Board board;
+    private Boards boards;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id")
+    private Members writers;
+
+
+    @Column(name="mod_req")
+    private boolean modReq;
+
+    @Column(length = 500)
     private String comment;
 
+
+    private boolean agree;
+
     //연관관계 편의 메소드
-    public void confirmBoard(Board board){
-        this.board=board;
-        board.addFeedback(this);
+    public void confirmBoard(Boards boards){
+        this.boards=boards;
+        boards.addFeedbacks(this);
+    }
+
+    //연관관계 편의 메소드
+    public void confirmMember(Members members){
+        this.writers=members;
+        writers.addFeedbacks(this);
     }
 
     // comment 필드의 getter 메서드 정의
@@ -37,9 +54,11 @@ public class Feedback extends FeedbackTimeEntity {
     }
 
     @Builder
-    public Feedback(Long id, Board board,String comment){
+    public Feedbacks(Long id, Boards boards,String comment){
         this.id=id;
-        this.board = board;
+        this.boards = boards;
         this.comment=comment;
+        this.modReq=false;
+        this.agree=false;
     }
 }
