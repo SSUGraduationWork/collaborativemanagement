@@ -4,8 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-./src/main/java/com.example.demo/config/Secret
-!src/main/resources/application-oauth.properties
+Secret
+application-oauth.properties
 
 ### STS ###
 .apt_generated

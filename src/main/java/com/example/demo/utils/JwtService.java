@@ -1,12 +1,10 @@
 package com.example.demo.utils;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.config.secret.Secret;
 import com.example.demo.src.account.dto.JwtDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
