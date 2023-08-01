@@ -1,15 +1,9 @@
 package com.example.upload.Service;
 
-import com.example.upload.Repository.BoardRepository;
+import com.example.upload.Repository.*;
 
-import com.example.upload.Repository.MemberRepository;
-import com.example.upload.Repository.TeamRepository;
-import com.example.upload.Repository.WorkRepository;
-import com.example.upload.domain.Boards;
+import com.example.upload.domain.*;
 
-import com.example.upload.domain.Members;
-import com.example.upload.domain.Teams;
-import com.example.upload.domain.Works;
 import com.example.upload.dto.request.BoardWriteRequest;
 import com.example.upload.dto.response.BoardDetailResponse;
 import com.example.upload.dto.response.BoardResponse;
@@ -41,12 +35,14 @@ public class BoardService {
     private MemberRepository memberRepository;
     private TeamRepository teamRepository;
     private WorkRepository workRepository;
+    private FeedbackStatusRepository feedbackStatusRepository;
     //글 작성
     public BoardResponse write(BoardWriteRequest request,Long memberId,Long teamId, Long workId, MultipartFile file) throws Exception{
         String projectPath=System.getProperty("user.dir")+ "\\src\\main\\resources\\static\\files";
         Members members = memberRepository.findById(memberId).get();
         Teams teams = teamRepository.findById(teamId).get();
         Works works = workRepository.findById(workId).get();
+      //  List<Long> MemberIdList= feedbackStatusRepository.findMemberIdsByTeamId(teamId);
         UUID uuid= UUID.randomUUID();
         String fileName=uuid+"_"+file.getOriginalFilename();
         File saveFile =new File(projectPath, fileName);
@@ -55,7 +51,34 @@ public class BoardService {
         boards.confirmMember(members);
         boards.confirmTeam(teams);
         boards.confirmWork(works);
+
         boardRepository.save(boards);
+
+
+
+
+
+        // 해당 팀에 속한 모든 멤버 가져와서 FeedbackStatuses에 추가
+        List<Members> allMembers = boards.getTeams().getAllMembers();
+
+        for (Members member : allMembers) {
+
+            // FeedbackStatuses 엔티티 생성 및 저장
+            FeedbackStatuses feedbackStatuses = new FeedbackStatuses();
+            feedbackStatuses.confirmBoard(boards); // 연관관계 설정
+            feedbackStatuses.setFeedbackYn(false); // 예시로 피드백 상태를 false로 설정
+
+
+            feedbackStatuses.confirmMember(member);
+
+            feedbackStatusRepository.save(feedbackStatuses);
+        }
+
+
+
+
+
+
 
         return BoardResponse.from(boards);
     }

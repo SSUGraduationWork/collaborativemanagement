@@ -23,12 +23,14 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
 
     //피드백 글쓰기
-    @PostMapping("/comment/{boardId}/{writerId}")
+    //isApproved=0인경우 피드백 거부, isApproved=1인경우 피드백 승인
+    @PostMapping("/comment/{boardId}/{writerId}/{isApproved}")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Response<FeedbackResponse>>  commentSave(@PathVariable("boardId") Long boardId,
                                                                    @PathVariable("writerId") Long writerId,
-                                                                   FeedbackRequest request){
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.save(boardId,writerId,request)));
+                                                                   FeedbackRequest request,
+                                                                   @PathVariable("isApproved") boolean isApproved){
+        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.save(boardId,writerId,request,isApproved)));
     }
 
     //피드백 보기

@@ -1,2 +1,60 @@
-package com.example.upload.domain;public class FeedbackStatuses {
+package com.example.upload.domain;
+
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Entity(name = "Feedback_statuses")
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class FeedbackStatuses {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "feedback_status_id")
+    private Long Id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Members users;
+
+    @ManyToOne
+    @JoinColumn(name = "board_id",  nullable = false)
+    private Boards boards;
+
+    @Column(name = "feedback_yn", nullable = false)
+    private boolean feedbackYn;
+
+    //연관관계 편의 메소드
+    public void confirmBoard(Boards boards){
+        this.boards=boards;
+        boards.addFeedbackStatuses(this);
+    }
+
+    //연관관계 편의 메소드
+    public void confirmMember (Members members){
+        this.users=members;
+        users.addFeedbackStatuses(this);
+    }
+
+    //게시판에 대한 피드백 승인 메소드
+    public void feedbackAgree(){
+        this.feedbackYn = true;
+    }
+
+    //게시판에 대한 피드백 거절 메소드
+    public void feedbackDeny(){
+        this.feedbackYn = false;
+    }
+
+    @Builder
+    public FeedbackStatuses(Members members, String feedbackYn){
+        this.boards = boards;
+        this.feedbackYn=false;
+        this.users=members;
+    }
 }

@@ -48,6 +48,8 @@ public class Feedbacks extends FeedbackTimeEntity {
         writers.addFeedbacks(this);
     }
 
+
+
     // comment 필드의 getter 메서드 정의
     public String getComment() {
         return comment;

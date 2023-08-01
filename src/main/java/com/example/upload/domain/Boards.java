@@ -50,10 +50,16 @@ public class Boards extends BaseTimeEntity {
     @Column(name = "del_yn")
     private boolean delYn;
 
+    @Column(name = "feedback_yn")
+    private boolean feedbackYn;
+
     //== 게시글을 삭제하면 달려있는 댓글 모두 삭제 ==//
     @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
     private List<Feedbacks> feedbackList = new ArrayList<>();
 
+    //== 게시글을 삭제하면 달려있는 댓글 모두 삭제 ==//
+    @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
+    private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
     public Boards updateViewCount(Long viewCount){
         this.viewCnt = viewCount+1;
@@ -65,10 +71,14 @@ public class Boards extends BaseTimeEntity {
         //comment의 Post 설정은 comment에서 함
         feedbackList.add(feedbacks);
     }
+    public void addFeedbackStatuses(FeedbackStatuses feedbackStatuses){
+        //comment의 Post 설정은 comment에서 함
+        feedbackStatusList.add(feedbackStatuses);
+    }
     //연관관계 편의 메소드
     public void confirmMember(Members members){
         this.users=members;
-        members.addBoards(this);
+        users.addBoards(this);
     }
 
     //연관관계 편의 메소드
@@ -90,8 +100,8 @@ public class Boards extends BaseTimeEntity {
         this.filename=filename;
         this.filepath=filepath;
         this.delYn=false;
+        this.feedbackYn=false;
     }
-
 
 
 }

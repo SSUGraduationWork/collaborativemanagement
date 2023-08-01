@@ -37,10 +37,39 @@ public class Teams {
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<Boards> boardList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
+    private List<TeamMembers> teamList = new ArrayList<>();
+
     //피드백 추가,연관관계 편의 메소드
     public void addBoards(Boards boards){
         //comment의 Post 설정은 comment에서 함
         boardList.add(boards);
     }
 
+    public void addTeams(TeamMembers teamMembers){
+        //comment의 Post 설정은 comment에서 함
+        teamList.add(teamMembers);
+    }
+
+    // 해당 팀에 속한 모든 멤버 가져오기
+    public List<Members> getAllMembers() {
+        List<Members> members = new ArrayList<>();
+        for (TeamMembers teamMember : teamList) {
+            members.add(teamMember.getUsers());
+        }
+        return members;
+    }
+
+/*
+    // 해당 팀에 속한 모든 멤버 가져오기
+    public List<Members> getMembers() {
+        List<Members> members = new ArrayList<>();
+        for (Members member : membersList) {
+            members.add(member);
+        }
+        return members;
+    }
+
+
+ */
 }

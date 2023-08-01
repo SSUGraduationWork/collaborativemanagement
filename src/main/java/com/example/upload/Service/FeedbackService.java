@@ -3,10 +3,12 @@ package com.example.upload.Service;
 import com.example.upload.Repository.BoardRepository;
 import com.example.upload.Repository.FeedbackRepository;
 
+import com.example.upload.Repository.FeedbackStatusRepository;
 import com.example.upload.Repository.MemberRepository;
 import com.example.upload.domain.Boards;
 
 
+import com.example.upload.domain.FeedbackStatuses;
 import com.example.upload.domain.Feedbacks;
 import com.example.upload.domain.Members;
 import com.example.upload.dto.request.BoardWriteRequest;
@@ -38,15 +40,27 @@ public class FeedbackService {
     private  BoardRepository boardRepository;
 
     private MemberRepository memberRepository;
+    private FeedbackStatusRepository feedbackStatusRepository;
 
 
-    public FeedbackResponse save(Long boardId, Long memberId, FeedbackRequest requset) {
+    public FeedbackResponse save(Long boardId, Long memberId, FeedbackRequest requset, boolean isApproved) {
 
         Boards boards =boardRepository.findById(boardId).get();
         Members writers =memberRepository.findById(memberId).get();
         Feedbacks feedbacks= toEntity(requset);
         feedbacks.confirmBoard(boards);
         feedbacks.confirmMember(writers);
+
+        //boards, writers로 feedbackStatus찾기
+        FeedbackStatuses feedbackStatuses =feedbackStatusRepository.findByBoardsAndUsers(boards, writers);
+        //feedback_yn=true로 바꾸기
+        if (isApproved) {
+            // 승인한 경우 feedbackYn=true로 바꾸기
+            feedbackStatuses.feedbackAgree();
+        } else {
+            // 거부한 경우 feedbackYn=false로 바꾸기
+            feedbackStatuses.feedbackDeny();
+        }
         feedbackRepository.save(feedbacks);
         return FeedbackResponse.from(feedbacks,boards);
     }
