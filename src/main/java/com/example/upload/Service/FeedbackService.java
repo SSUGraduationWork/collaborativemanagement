@@ -51,19 +51,48 @@ public class FeedbackService {
         feedbacks.confirmBoard(boards);
         feedbacks.confirmMember(writers);
 
+
         //boards, writers로 feedbackStatus찾기
-        FeedbackStatuses feedbackStatuses =feedbackStatusRepository.findByBoardsAndUsers(boards, writers);
-        //feedback_yn=true로 바꾸기
+        FeedbackStatuses feedbackStatus =feedbackStatusRepository.findByBoardsAndUsers(boards, writers);
         if (isApproved) {
             // 승인한 경우 feedbackYn=true로 바꾸기
-            feedbackStatuses.feedbackAgree();
+            feedbackStatus.feedbackAgree();
         } else {
             // 거부한 경우 feedbackYn=false로 바꾸기
-            feedbackStatuses.feedbackDeny();
+            feedbackStatus.feedbackDeny();
         }
         feedbackRepository.save(feedbacks);
+
+
+
+        // 팀원 모두 동의하면 board의 feedback_yn=true로 변경
+        // Board에 해당하는 모든 FeedbackStatuses 조회
+        List<FeedbackStatuses> feedbackStatusesList = feedbackStatusRepository.findByBoards(boards);
+
+        // FeedbackStatuses가 존재하는 경우에만 처리
+        if (!feedbackStatusesList.isEmpty()) {
+            boolean hasFeedbackYnTrue = true;
+
+            // 모든 FeedbackStatuses의 feedback_yn이 true인지 확인
+            for (FeedbackStatuses feedbackStatuses : feedbackStatusesList) {
+                if (!feedbackStatuses.isFeedbackYn()) { //한명이라도 feedback을 안했으면
+                    hasFeedbackYnTrue = false;
+                    break;
+                }
+            }
+
+            // 모든 FeedbackStatuses의 feedback_yn이 true라면 board의 feedback_yn도 true로 변경
+            if (hasFeedbackYnTrue) {
+                boards.setFeedbackYn(true);
+                boardRepository.save(boards);
+            }
+        }
+
         return FeedbackResponse.from(feedbacks,boards);
     }
+
+
+
 
     public static Feedbacks toEntity(FeedbackRequest feedbackRequest) {
         return Feedbacks.builder()

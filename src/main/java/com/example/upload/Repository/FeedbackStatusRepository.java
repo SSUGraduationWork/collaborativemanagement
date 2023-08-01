@@ -13,4 +13,6 @@ import java.util.List;
 public interface FeedbackStatusRepository extends JpaRepository<FeedbackStatuses, Long> {
 
     FeedbackStatuses findByBoardsAndUsers(Boards boards, Members users);
+
+    List<FeedbackStatuses> findByBoards(Boards board);
 }
