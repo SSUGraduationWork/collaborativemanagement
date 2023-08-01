@@ -1,9 +1,6 @@
 # collaborativemanagement
 팀플을 하는 과정을 투명하게 공개함으로써 팀원들의 참여도를 높이고, 보다 객관적인 평가가 가능한 협업 관리 도구입니다.
 
-# Front
-CoWork Frontend 작업 공간입니다.
-
 ## Github flow 작성 양식
 
 ``` text
