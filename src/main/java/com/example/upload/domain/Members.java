@@ -29,8 +29,6 @@ public class Members  {
     @Column(name = "user_id", length = 45)
     private String userId;
 
-    @Column(length = 45)
-    private String password;
 
     @Column(name = "user_name", length = 10)
     private String userName;
@@ -62,6 +60,9 @@ public class Members  {
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<TeamMembers> memberList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
+    private List<Alarms> alarmList = new ArrayList<>();
+
     public void addFeedbackStatuses(FeedbackStatuses feedbackStatuses){
         //comment의 Post 설정은 comment에서 함
         feedbackStatusList.add(feedbackStatuses);
@@ -82,5 +83,10 @@ public class Members  {
     public void addMembers(TeamMembers teamMembers){
         //comment의 Post 설정은 comment에서 함
         memberList.add(teamMembers);
+    }
+
+    public void addAlarms(Alarms alarms){
+        //comment의 Post 설정은 comment에서 함
+        alarmList.add(alarms);
     }
 }

@@ -4,7 +4,9 @@ import com.example.upload.Service.FeedbackService;
 
 import com.example.upload.common.CommonCode;
 import com.example.upload.common.Response;
+import com.example.upload.domain.Boards;
 import com.example.upload.domain.Feedbacks;
+import com.example.upload.domain.Members;
 import com.example.upload.dto.request.FeedbackRequest;
 import com.example.upload.dto.response.BoardResponse;
 import com.example.upload.dto.response.FeedbackResponse;
@@ -32,6 +34,16 @@ public class FeedbackController {
                                                                    @PathVariable("isApproved") boolean isApproved){
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.save(boardId,writerId,request,isApproved)));
     }
+
+    //피드백 반영하여 수정한 게시판에 대한 재수락, 재수정
+    @PostMapping("/recomment/{boardId}/{writerId}/{isApproved}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void  reApproved(@PathVariable("boardId") Long boardId,
+                            @PathVariable("writerId") Long writerId,
+                            @PathVariable("isApproved") boolean isApproved){
+        feedbackService.reFeedback(boardId,writerId,isApproved);
+    }
+
 
     //피드백 보기
     @GetMapping("/comment/{boardId}")

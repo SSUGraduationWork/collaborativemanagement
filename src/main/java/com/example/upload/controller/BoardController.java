@@ -73,19 +73,13 @@ public class BoardController {
 
 
     //게시판 수정
-    @PostMapping("/board/update/{boardId}/{memberId}/{teamId}/{workId}")
+    @PostMapping("/board/update/{boardId}/{mod_compl}") //mod_compl, 수정을 완료했는지
     public ResponseEntity<Response<BoardResponse>> boardModify(@PathVariable("boardId") Long boardId,
                                                                @Valid BoardWriteRequest request,
-                                                               @PathVariable("memberId") Long memberId,
-                                                               @PathVariable("teamId") Long teamId,
-                                                               @PathVariable("workId") Long workId,
-                                                               @RequestParam("file") MultipartFile file) throws Exception {
-        Boards boardTemp= boardService.boardUpdate(boardId);
-        boardTemp.setTitle(request.getTitle());
-        boardTemp.setContent(request.getContent());
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.reWrite(boardTemp,memberId,teamId,workId,file)));
+                                                               @RequestParam("file") MultipartFile file,
+                                                               @PathVariable("mod_compl") boolean mod_compl) throws Exception {
+        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.reWrite(boardId,request, file ,mod_compl)));
     }
-
 
 
 

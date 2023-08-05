@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Client</title>
+</head>
+<body>
+<div id="output"></div>
+
+<script>
+    function handleSSE(event) {
+        if (event.data) {
+            // UTF-8로 디코딩하여 데이터를 처리
+            const utf8Decoder = new TextDecoder("utf-8");
+            const decodedData = utf8Decoder.decode(event.data);
+
+            // 데이터를 output 요소에 추가
+            const outputElement = document.getElementById("output");
+            outputElement.textContent = decodedData; // 또는 outputElement.innerText = decodedData;
+
+            // 디코딩된 데이터를 처리하는 로직 추가
+            // ...
+        }
+    }
+
+    const eventSource = new EventSource("/notifications/subscribe/2");
+    eventSource.onmessage = handleSSE;
+</script>
+</body>
+</html>

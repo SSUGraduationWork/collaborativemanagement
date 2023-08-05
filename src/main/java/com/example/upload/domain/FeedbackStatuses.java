@@ -18,11 +18,11 @@ public class FeedbackStatuses {
     @Column(name = "feedback_status_id")
     private Long Id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Members users;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id",  nullable = false)
     private Boards boards;
 

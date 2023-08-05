@@ -22,6 +22,8 @@ public class Feedbacks extends FeedbackTimeEntity {
     @JoinColumn(name = "board_id")
     private Boards boards;
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id")
     private Members writers;

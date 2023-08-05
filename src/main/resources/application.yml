@@ -3,6 +3,9 @@ spring:
   sql:
     init:
       platform: mysql
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 
   datasource:
     url: jdbc:mysql://serverdb.cafcib2vatvt.us-east-1.rds.amazonaws.com/co_work?autoReconnect=true&setTimezone=Asia/Seoul # 변경해주세요

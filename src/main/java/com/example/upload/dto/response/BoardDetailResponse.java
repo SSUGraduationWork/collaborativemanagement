@@ -13,7 +13,7 @@ public class BoardDetailResponse {
 
     private Long boardId;
     private String title;
-
+    private String content;
 
 //사용자명과 작업명은 추후 추가해야함
 //private String username;
@@ -21,15 +21,17 @@ public class BoardDetailResponse {
 //private String workname;
 
     @Builder
-    public BoardDetailResponse(Long boardId, String title, Long viewCount, LocalDateTime createdTime){
+    public BoardDetailResponse(Long boardId, String title,String content){
         this.boardId = boardId;
         this.title = title;
+        this.content=content;
     }
 
     public static BoardDetailResponse from(Boards boards) {
         return BoardDetailResponse.builder()
                 .boardId(boards.getId())
                 .title(boards.getTitle())
+                .content(boards.getContent())
                 .build();
     }
 }
