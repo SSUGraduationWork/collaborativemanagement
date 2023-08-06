@@ -34,7 +34,7 @@ public class AlarmService {
         return AlarmDetailResponse.from(alarm);
     }
 
-    //게시글 리스트 처리리
+    //알람 리스트 처리리
 
     public List<AlarmDetailResponse> alarmList(Long memberId, Pageable pageable) {
         // memberId를 사용하여 해당 멤버의 알람 리스트를 가져옴

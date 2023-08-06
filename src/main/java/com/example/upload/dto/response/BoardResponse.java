@@ -16,17 +16,19 @@ private LocalDateTime createdTime;
 
 private Long viewCount;
 
+private String workName;
 //사용자명과 작업명은 추후 추가해야함
 //private String username;
 
 //private String workname;
 
     @Builder
-    public BoardResponse(Long boardId, String title, Long viewCount, LocalDateTime createdTime){
+    public BoardResponse(Long boardId, String title, Long viewCount, LocalDateTime createdTime, String workName){
         this.boardId = boardId;
         this.title = title;
         this.viewCount=viewCount;
         this.createdTime=createdTime;
+        this.workName=workName;
     }
 
     public static BoardResponse from(Boards boards) {
@@ -35,6 +37,7 @@ private Long viewCount;
                 .title(boards.getTitle())
                 .viewCount(boards.getViewCnt())
                 .createdTime(boards.getCreatedAt())
+                .workName(boards.getWorks().getWorkName())
                 .build();
     }
 }

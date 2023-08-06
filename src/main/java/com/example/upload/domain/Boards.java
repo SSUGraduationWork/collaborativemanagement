@@ -37,12 +37,7 @@ public class Boards extends BaseTimeEntity {
     @Column(length = 3000)
     private String content;
 
-    //파일 정보 저장
-    @Column(length = 100)
-    private String filename;
 
-    @Column(length = 100)
-    private String filepath;
 
     @Column(name = "view_cnt")
     private Long viewCnt;     //조회수
@@ -61,6 +56,9 @@ public class Boards extends BaseTimeEntity {
     @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
     private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "boards", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Files> fileList = new ArrayList<>();
+
     public Boards updateViewCount(Long viewCount){
         this.viewCnt = viewCount+1;
         return this;
@@ -71,6 +69,13 @@ public class Boards extends BaseTimeEntity {
         //comment의 Post 설정은 comment에서 함
         feedbackList.add(feedbacks);
     }
+
+    //파일 추가,연관관계 편의 메소드
+    public void addFiles(Files files){
+        //comment의 Post 설정은 comment에서 함
+        fileList.add(files);
+    }
+
     public void addFeedbackStatuses(FeedbackStatuses feedbackStatuses){
         //comment의 Post 설정은 comment에서 함
         feedbackStatusList.add(feedbackStatuses);
@@ -93,12 +98,10 @@ public class Boards extends BaseTimeEntity {
         works.addBoards(this);
     }
     @Builder
-    public Boards(String title, String content,String filename, String filepath){
+    public Boards(String title, String content){
         this.title = title;
         this.content = content;
         this.viewCnt = 0L;
-        this.filename=filename;
-        this.filepath=filepath;
         this.delYn=false;
         this.feedbackYn=false;
     }

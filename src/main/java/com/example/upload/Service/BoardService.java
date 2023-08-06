@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +39,7 @@ public class BoardService {
     private WorkRepository workRepository;
     private FeedbackStatusRepository feedbackStatusRepository;
     private  AlarmRepository alarmRepository;
+    private  FileRepository fileRepository;
 
     //글 작성
     public BoardResponse write(BoardWriteRequest request,Long memberId,Long teamId, Long workId, MultipartFile file) throws Exception{
@@ -51,13 +53,21 @@ public class BoardService {
         File saveFile =new File(projectPath, fileName);
         file.transferTo(saveFile);
 
-        Boards boards =toEntity(request,fileName);
+        Boards boards =toEntity(request);
         boards.confirmMember(members);
         boards.confirmTeam(teams);
         boards.confirmWork(works);
 
         boardRepository.save(boards);
 
+
+        // 빌더를 사용하여 파일 객체 생성
+        Files file1 = Files.builder()
+                .filename(fileName)
+                .filepath("/files/" + fileName)
+                .build();
+        file1.confirmBoard(boards);
+        fileRepository.save(file1);
         //멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
         FeedbackStatusAndAlarm(boards, members,works);
 
@@ -65,6 +75,41 @@ public class BoardService {
         return BoardResponse.from(boards);
     }
 
+    //글 작성
+    public BoardResponse multiWrite(BoardWriteRequest request, Long memberId, Long teamId, Long workId, MultipartFile[] files) throws Exception {
+        // 게시판 등록
+        String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
+        Members members = memberRepository.findById(memberId).get();
+        Teams teams = teamRepository.findById(teamId).get();
+        Works works = workRepository.findById(workId).get();
+
+        Boards boards = toEntity(request);
+        boards.confirmMember(members);
+        boards.confirmTeam(teams);
+        boards.confirmWork(works);
+
+        boardRepository.save(boards);
+        // Save all uploaded files
+        for (MultipartFile file : files) {
+            UUID uuid = UUID.randomUUID();
+            String fileName = uuid + "_" + file.getOriginalFilename();
+            File saveFile = new File(projectPath, fileName);
+            file.transferTo(saveFile);
+
+
+            // 빌더를 사용하여 파일 객체 생성
+            Files file1 = Files.builder()
+                    .filename(fileName)
+                    .filepath("/files/" + fileName)
+                    .build();
+            file1.confirmBoard(boards);
+            fileRepository.save(file1);
+
+        }
+        // 멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
+        FeedbackStatusAndAlarm(boards, members, works);
+        return BoardResponse.from(boards);
+    }
 
 
     public void FeedbackStatusAndAlarm(Boards boards, Members writers,Works works){
@@ -105,12 +150,10 @@ public class BoardService {
 
 
 
-    public static Boards toEntity(BoardWriteRequest boardWriteRequest, String fileName) {
+    public static Boards toEntity(BoardWriteRequest boardWriteRequest) {
         return Boards.builder()
                 .title(boardWriteRequest.getTitle())
                 .content(boardWriteRequest.getContent())
-                .filename(fileName)
-                .filepath("/files/" + fileName)
                 .build();
     }
 
@@ -132,8 +175,53 @@ public class BoardService {
 
 
 
+    //다중 파일 글 재작성
+    public BoardResponse multiReWrite(Long boardId,BoardWriteRequest request, MultipartFile[] files, boolean mod_compl) throws Exception{
+        String projectPath=System.getProperty("user.dir")+ "\\src\\main\\resources\\static\\files";
 
-    //글 재작성
+        Boards boards= boardRepository.findById(boardId).get();
+
+        boards.setTitle(request.getTitle());
+        boards.setContent(request.getContent());
+
+
+        //기존에 저장되어 있던 파일들은 지우고 시작
+        deletePhotoFromFileSystem(boards.getFileList());
+
+        // 새로 업로드 될 파일
+        for (MultipartFile file : files) {
+            UUID uuid = UUID.randomUUID();
+            String fileName = uuid + "_" + file.getOriginalFilename();
+            File saveFile = new File(projectPath, fileName);
+            file.transferTo(saveFile);
+
+
+            // 빌더를 사용하여 파일 객체 생성
+            Files file1 = Files.builder()
+                    .filename(fileName)
+                    .filepath("/files/" + fileName)
+                    .build();
+            file1.confirmBoard(boards);
+            fileRepository.save(file1);
+
+        }
+
+
+        //조회수 증가 로직
+        boards.updateViewCount(boards.getViewCnt());
+
+        boardRepository.save(boards);
+
+        if(mod_compl==true)
+        {//글작성자 제외 팀원 모두에게 알람이 가도록
+            completionAlarm(boards);
+        }
+        return BoardResponse.from(boards);
+    }
+
+
+
+    //단일 파일 글 재작성
     public BoardResponse reWrite(Long boardId,BoardWriteRequest request, MultipartFile file, boolean mod_compl) throws Exception{
         String projectPath=System.getProperty("user.dir")+ "\\src\\main\\resources\\static\\files";
 
@@ -146,19 +234,33 @@ public class BoardService {
         String fileName=uuid+"_"+file.getOriginalFilename();
         File saveFile =new File(projectPath, fileName);
         file.transferTo(saveFile);
-        //게시판 수정
-        boards.setFilename(fileName);
-        boards.setFilepath("/files/"+fileName);
-
         boards.setTitle(request.getTitle());
         boards.setContent(request.getContent());
+
+        List<Files> fileList = boards.getFileList();
+
+        // 파일 리스트가 비어있지 않은 경우에만 첫 번째 파일을 가져옴
+        if (!fileList.isEmpty()) {
+            Files firstFile = fileList.get(0);
+            // 첫 번째 파일에 대한 로직 처리
+
+            //기존에 저장되어 있던 파일들은 지우고 시작
+            OneDeletePhotoFromFileSystem(firstFile);
+        }
+
+        // 빌더를 사용하여 파일 객체 생성
+        Files files = Files.builder()
+                .filename(fileName)
+                .filepath("/files/" + fileName)
+                .build();
+        files.confirmBoard(boards);
         //조회수 증가 로직
         boards.updateViewCount(boards.getViewCnt());
 
         boardRepository.save(boards);
 
-        if(mod_compl==true)//수정을 완료했으면 , 수정 요청을 한 사람한테만 수정 완료 알람
-        {//수정 요청을 한 사람한테만 알람이 가도록
+        if(mod_compl==true)
+        {//글작성자 제외 팀원 모두에게 알람이 가도록
             completionAlarm(boards);
         }
         return BoardResponse.from(boards);
@@ -199,35 +301,66 @@ public class BoardService {
     //특정 게시글 삭제
     public void boardDelete(Long id){
         Boards boards= boardRepository.findById(id).get();
-        deletePhotoFromFileSystem(boards.getFilepath());
+
+        deletePhotoFromFileSystem(boards.getFileList());
         boardRepository.deleteById(id);
     }
 
-    private void deletePhotoFromFileSystem(String photoPath) {
+    private void deletePhotoFromFileSystem(List<Files> files) {
         try {
+            for (Files file : files) {
+                String photoPath = file.getFilepath();
+                String projectPath = System.getProperty("user.dir");
+                File photoFile = new File(projectPath + "/src/main/resources/static/" + photoPath);
 
-            String projectPath = System.getProperty("user.dir");
-            File photoFile = new File(projectPath + "/src/main/resources/static/" + photoPath);
 
 
-
-            // 파일이 존재하는지 확인하고 삭제
-            if (photoFile.exists()) {
-                if (photoFile.delete()) {
-                    System.out.println("사진 파일 삭제 성공: " + photoPath);
+                // 파일이 존재하는지 확인하고 삭제
+                if (photoFile.exists()) {
+                    if (photoFile.delete()) {
+                        System.out.println("사진 파일 삭제 성공: " + photoPath);
+                    } else {
+                        System.err.println("사진 파일 삭제 실패: " + photoPath);
+                    }
                 } else {
-                    System.err.println("사진 파일 삭제 실패: " + photoPath);
+                    System.err.println("해당 경로에 사진 파일이 존재하지 않습니다: " + photoPath);
                 }
-            } else {
-                System.err.println("해당 경로에 사진 파일이 존재하지 않습니다: " + photoPath);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("사진 파일 삭제 중 오류 발생: " + photoPath);
+            System.err.println("사진 파일 삭제 중 오류 발생: ");
         }
     }
 
 
+
+    private void OneDeletePhotoFromFileSystem(Files file) {
+        try {
+
+                String photoPath = file.getFilepath();
+                String projectPath = System.getProperty("user.dir");
+                File photoFile = new File(projectPath + "/src/main/resources/static/" + photoPath);
+
+
+
+                // 파일이 존재하는지 확인하고 삭제
+                if (photoFile.exists()) {
+                    if (photoFile.delete()) {
+                        System.out.println("사진 파일 삭제 성공: " + photoPath);
+                    } else {
+                        System.err.println("사진 파일 삭제 실패: " + photoPath);
+                    }
+                } else {
+                    System.err.println("해당 경로에 사진 파일이 존재하지 않습니다: " + photoPath);
+                }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("사진 파일 삭제 중 오류 발생: ");
+        }
+    }
 
 
 
