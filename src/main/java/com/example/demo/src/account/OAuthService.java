@@ -58,7 +58,6 @@ public class OAuthService {
                     GoogleUser googleUser = googleOauth.getUserInfo(userInfoResponse);
 
                     String user_email = googleUser.getEmail();
-                    System.out.println("email = " +user_email);
 
                     //우리 서버의 db와 대조하여 해당 User가 존재하는지 확인
                     Member member = memberService.getUser(user_email);
@@ -85,7 +84,7 @@ public class OAuthService {
     public void redirectToSignUp(HttpServletRequest request, HttpServletResponse response, GoogleUser googleUser) throws IOException {
         // 데이터 생성
         String email =  googleUser.getEmail();
-        String picture_url = googleUser.getPictureUrl();
+        String picture_url = googleUser.getPicture();
 
         // 세션에 데이터 저장
         HttpSession session = request.getSession();

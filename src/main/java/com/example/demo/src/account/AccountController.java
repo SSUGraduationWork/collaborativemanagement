@@ -42,10 +42,11 @@ public class AccountController {
 
     @PostMapping("/signup")
     public BaseResponse<PostMemberRes> signUp (HttpServletRequest request, @RequestBody MemberDto memberDto) {
+
         HttpSession session = request.getSession();
-        //String email = (String) session.getAttribute("email");
+        String email = (String) session.getAttribute("email");
         String pictureUrl = (String) session.getAttribute("pictureUrl");
-        String email = "pyl66600@gmail.com";
+
         if (email != null) {
             memberDto.setUser_email(email);
             memberDto.setPicture_url(pictureUrl);
