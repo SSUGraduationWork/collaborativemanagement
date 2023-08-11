@@ -6,7 +6,9 @@ const workDao = require("./workDao");
 const workProvider = {
     retrieveWorkList : async (teamId) => {
         const connection = await pool.getConnection(async (conn) => conn);
-        const result = await workDao.selectWorks(connection, teamId);
+        const workResult = await workDao.selectWorks(connection, teamId);
+        const teamMembers = await workDao.selectTeamMembers(connection, teamId);
+        const result = {teamMembers : teamMembers, works : workResult,};
         connection.release();
         return result;
     },

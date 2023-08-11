@@ -16,16 +16,16 @@ const workDao = {
         return workRows;
     },
 
-    selectTeamName: async (connection, teamId) => {
-        const selectTeamNameQuery = `
-            SELECT CONCAT(project_name,' ',team_name) AS team_name 
-            FROM Teams T 
-            LEFT JOIN Projects P 
-            ON T.project_id = P.project_id
-            WHERE team_id = ?;
+    selectTeamMembers: async (connection, teamId) => {
+        const selectTeamMembersQuery = `
+            SELECT user_id, user_name, picture_url 
+            FROM Team_members T 
+            JOIN Members M 
+            ON T.user_id = M.id 
+            WHERE team_id = 1;
         `;
-        const [teamName] = await connection.query(selectTeamNameQuery, teamId);
-        return teamName;
+        const [teamMembers] = await connection.query(selectTeamMembersQuery, teamId);
+        return teamMembers;
     },
 
     selectWorkById: async (connection, workId) => {
