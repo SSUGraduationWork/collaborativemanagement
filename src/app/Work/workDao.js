@@ -18,7 +18,7 @@ const workDao = {
 
     selectTeamMembers: async (connection, teamId) => {
         const selectTeamMembersQuery = `
-            SELECT user_id, user_name, picture_url 
+            SELECT user_id, CONCAT(student_number, ' ', user_name) AS user_name, picture_url 
             FROM Team_members T 
             JOIN Members M 
             ON T.user_id = M.id 
