@@ -59,6 +59,37 @@ const workService = {
             console.log(err);
             return errResponse(baseResponse.DB_ERROR);
         }
+    },
+
+    patchWorker : async (workId, worker_number, worker_arr) => {
+        try{
+            const connection = await pool.getConnection(async(conn) => (conn));
+            
+            //유저 삭제 후 새로 등록, worker_number update
+            const deletedWorkers = await workDao. deleteWorkers(connection. worId);
+            const patchWorkers = await workDao.insertWorkers(conneciton, workId, worker_arr);
+            const patchWorkerNumber = await workDao.patchWorkerNumber(connection, workId, worker_number);
+            
+            connection.release();
+            return response(baseResponse.SUCCESS);
+            
+        } catch(err) {
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
+    },
+    patchWork : async (workId, updateValue, val) => {
+        try{
+            const connection = await pool.getConnection(async(conn) => (conn));
+            const patchWork = await workDao.patchWork(connection, workId, updateValue, val);
+
+            connection.release();
+            return response(baseResponse.SUCCESS);
+
+        } catch(err){
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
     }
 }
 

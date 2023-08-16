@@ -87,23 +87,49 @@ exports.deleteWork = async function (req, res) {
  * API No. 5
  * API Name : 특정 작업 수정 API
  * [PUT] /work/:teamId/:workId
- * body : workName, worker,endDate, importance, status
+ * body : work_name, worker,end_date, importance, status
  */
 
 exports.putWork = async function (req, res) {
 
 
-    const workId = req.params.workId;
-
-    const {workName, worker, endDate, importance, status} = req.body;
+    const {workId, teamId} = req.params;
+    console.log(req.params);
+    const {work_name, worker, end_date, importance, status} = req.body;
 
     let worker_arr = JSON.parse(worker);
-    const workerNumber = worker_arr.length;
+    const worker_number = worker_arr.length;
 
     const updateWorkParams = [
-        workName, endDate, importance, status, workerNumber
+        work_name, end_date, importance, status, worker_number
     ];
     const editWorkResult = await workService.editWork(workId, updateWorkParams, worker_arr);
     res.send(editWorkResult);
 
 };
+
+
+/**
+ * API No. 6
+ * API Name : 작업명, 담당자, 마감일, 중요도, 상태 중 하나 수정 API
+ * [PUT] /work/:workId/:updateValue
+ * body : work_namre or end_date or importance or status or worker
+ * 수정하려는 값: updateValue, 수정 내용 : val
+ */
+
+exports.patchWork = async(req, res) => {
+    const {workId, updateValue} = req.params
+    
+    const val = req.body[updateValue];  
+    if (val == undefined) return res.send(errResponse(baseResponse.NOT_MATCH));
+    if (updateValue == "worker"){
+        const worker_arr = JSON.parse(val);
+        const worker_number = worker_arr.length;
+        const patchWorkerResult = await workService.patchWorker(workId, worker_number, worker_arr);
+        return res.send(patchWorkerResult);
+        
+    } else{
+        const patchWorkResult = await workService.patchWork(workId, updateValue, val);
+        return res.send(patchWorkResult);
+    }
+}

@@ -13,6 +13,9 @@ module.exports = (app) => {
     //4. 특정 작업 삭제 API
     app.delete('/work/:teamId/:workId', work.deleteWork);
 
-    //5. 특정 작업 수정 API
-    app.put('/work/:teamId/:workId', work.putWork);
+    //5. 특정 작업 전체 수정 API
+    app.put('/work/:workId', work.putWork);
+
+    //6. 특정 작업 하나 수정 API
+    app.patch('/work/:workId/:updateValue', work.patchWork);
 };

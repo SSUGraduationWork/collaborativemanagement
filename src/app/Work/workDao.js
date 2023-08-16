@@ -2,15 +2,13 @@ const workDao = {
 
     selectWorks: async (connection, teamId) => {
         const selectWorksQuery = `
-            SELECT work_id, work_name, GROUP_CONCAT(A.user_info SEPARATOR ';') AS worker, GROUP_CONCAT(A.picture_url SEPARATOR ';') AS picture_url, end_date, importance, status
-            FROM (SELECT Works.work_id, work_name, end_date, importance, status, Members.picture_url, CONCAT(Members.student_number, ' ', Members.user_name) AS user_info
-                  FROM Works
-                           LEFT JOIN Workers
-                                     ON Workers.work_id = Works.work_id
-                           LEFT JOIN Members
-                                     ON Members.id = Workers.user_id
-                  WHERE Works.team_id = ?) AS A
-            GROUP BY work_id;   
+        SELECT work_id, work_name, GROUP_CONCAT(user_id SEPARATOR ';') AS worker, end_date, importance, status
+        FROM (SELECT Works.work_id, work_name, end_date, importance, status, user_id
+              FROM Works
+                    JOIN Workers
+                        ON Workers.work_id = Works.work_id
+              WHERE Works.team_id = ?) AS A
+        GROUP BY work_id;
         `;
         const [workRows] = await connection.query(selectWorksQuery, teamId);
         return workRows;
@@ -132,6 +130,26 @@ const workDao = {
         );
 
         return deleteWorkInfoRow;
+    },
+
+    patchWorkerNumber : async (connection, workId, worker_number) => {
+        const patchWorkerQuery = `
+            UPDATE Works SET worker_number = ${worker_number}
+            WHERE work_id = ${workId};  
+        `
+        const updateWorkerNumber = await connection.query(patchWorkerQuery);
+
+        return updateWorkerNumber;
+    },
+    patchWork : async (connection, workId, updateValue, val) => {
+        const patchWorkQuery = `
+            UPDATE Works 
+            SET ${updateValue} = "${val}"
+            WHERE work_id = ${workId};
+        `
+        const updateWork = await connection.query(patchWorkQuery);
+
+        return updateWork;
     }
 }
 module.exports = workDao;
