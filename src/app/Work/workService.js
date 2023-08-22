@@ -8,19 +8,17 @@ const {errResponse} = require("../../../config/response");
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
 const workService = {
-    createWork : async (insertWorkParams, worker_arr) => {
+    createWork : async (teamId) => {
         try{
             const connection = await pool.getConnection(async(conn) => conn);
 
-            const createdWork = await workDao.insertWork(connection, insertWorkParams);
+            const createdWork = await workDao.insertWork(connection, teamId);
             const workId = createdWork[0].insertId;
             console.log(`추가된 작업: ${workId}`);
 
-            const createdWorkers = await workDao.insertWorkers(connection, workId, worker_arr);
             connection.release();
 
-            if (createdWorkers) return response(baseResponse.SUCCESS, {'work_id' : workId});
-            else return errResponse(baseResponse.DB_ERROR);
+            return response(baseResponse.SUCCESS, {'work_id' : workId});
 
         } catch(err) {
             console.log(err);
@@ -52,6 +50,7 @@ const workService = {
             console.log(`삭제된 작업 담당자 수 : ${deletedWorkers[0].affectedRows}, 작업 아이디 : ${workId}`);
 
             const updatedWorkers = await workDao.insertWorkers(connection, workId, worker_arr);
+            connection.release();
             if (updatedWorkers) return response(baseResponse.SUCCESS, {'work_id' : workId});
             else return errResponse(baseResponse.DB_ERROR);
 
@@ -66,8 +65,8 @@ const workService = {
             const connection = await pool.getConnection(async(conn) => (conn));
             
             //유저 삭제 후 새로 등록, worker_number update
-            const deletedWorkers = await workDao. deleteWorkers(connection. worId);
-            const patchWorkers = await workDao.insertWorkers(conneciton, workId, worker_arr);
+            const deletedWorkers = await workDao. deleteWorkers(connection, workId);
+            const patchWorkers = await workDao.insertWorkers(connection, workId, worker_arr);
             const patchWorkerNumber = await workDao.patchWorkerNumber(connection, workId, worker_number);
             
             connection.release();

@@ -8,10 +8,10 @@ module.exports = (app) => {
     app.post('/work/:teamId',work.postWork);
 
     // 3. 특정 작업 조회 API
-    app.get('/work/:teamId/:workId', work.getWorkById);
+    app.get('/work/detail/:workId', work.getWorkById);
 
     //4. 특정 작업 삭제 API
-    app.delete('/work/:teamId/:workId', work.deleteWork);
+    app.delete('/work/:workId', work.deleteWork);
 
     //5. 특정 작업 전체 수정 API
     app.put('/work/:workId', work.putWork);

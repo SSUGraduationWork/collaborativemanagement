@@ -28,25 +28,9 @@ exports.getWorks = async (req, res) => {
  */
 exports.postWork = async (req, res) => {
 
-    /**
-     * Body: workName, worker,endDate, importance, status
-     */
-    const {workName, worker, endDate, importance, status} = req.body;
     const teamId = req.params.teamId;
-    let workerNumber;
-    let worker_arr = [];
 
-    if (worker) {
-        worker_arr = JSON.parse(worker);
-    }
-
-    workerNumber = worker_arr.length;
-
-    const insertWorkParams = [
-        teamId, workName, endDate, importance, status, workerNumber
-    ];
-
-    const postWorkResult = await workService.createWork(insertWorkParams, worker_arr);
+    const postWorkResult = await workService.createWork(teamId);
 
     return res.send(postWorkResult);
 
@@ -55,7 +39,7 @@ exports.postWork = async (req, res) => {
 /**
  * API No. 3
  * API Name : 특정 작업 조회 API
- * [GET] /work/:teamId/:workId
+ * [GET] /work/detail/:workId
  */
 exports.getWorkById = async (req, res) => {
     try {
@@ -71,7 +55,7 @@ exports.getWorkById = async (req, res) => {
 /**
  * API No. 4
  * API Name : 특정 작업 삭제 API
- * [DELETE] /work/:teamId/:workId
+ * [DELETE] /work/:workId
  */
 exports.deleteWork = async function (req, res) {
 
@@ -121,11 +105,11 @@ exports.patchWork = async(req, res) => {
     const {workId, updateValue} = req.params
     
     const val = req.body[updateValue];  
+    console.log(`update "${updateValue}" to ${val}`);
     if (val == undefined) return res.send(errResponse(baseResponse.NOT_MATCH));
     if (updateValue == "worker"){
-        const worker_arr = JSON.parse(val);
-        const worker_number = worker_arr.length;
-        const patchWorkerResult = await workService.patchWorker(workId, worker_number, worker_arr);
+        const worker_number = val.length;
+        const patchWorkerResult = await workService.patchWorker(workId, worker_number, val);
         return res.send(patchWorkerResult);
         
     } else{
