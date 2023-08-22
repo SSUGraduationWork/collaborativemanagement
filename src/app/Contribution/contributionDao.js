@@ -1,11 +1,11 @@
 const contributionDao = {
     selectContributions : async(connection, teamId) => {
         const selectContributionsQuery = `
-            SELECT M.id AS user_id, CONCAT(M.student_number, ' ', M.user_name) AS team_member, C.contribution
+            SELECT M.id AS user_id, CONCAT(M.student_number, ' ', M.user_name) AS name, M.picture_url, T.contribution
             FROM Members M
-                LEFT JOIN Contributions C
-                    ON M.id = C.user_id
-            WHERE C.team_id = ?;
+                LEFT JOIN Team_members T
+                    ON M.id = T.user_id
+            WHERE T.team_id = ?;
         `;
 
         const [contributionRows] = await connection.query(selectContributionsQuery, teamId);
@@ -15,7 +15,7 @@ const contributionDao = {
         const selectWorkProgressQuery = `
             SELECT count(*) AS totalWorks, 
                    count(CASE WHEN status = 1 THEN 1 END) AS notStarted, 
-                   count(CASE WHEN status = 3 and status = 2 THEN 1 END) AS inProgress, 
+                   count(CASE WHEN status = 3 or status = 2 THEN 1 END) AS inProgress, 
                    count(CASE WHEN status = 4 THEN 1 END) AS done 
             FROM Works 
             WHERE team_id = ?;

@@ -12,10 +12,9 @@ exports.getContributions = async (req, res) => {
 
     try{
         const teamId = req.params.teamId;
-
         const contributionList = await contributionProvider.retrieveContributions(teamId);
-        const workProgress = await contributionProvider.retrieveWorkProgress(teamId);
-        const result = {workProgress, contribution : contributionList}
+        const progress = await contributionProvider.retrieveWorkProgress(teamId);
+        const result = {progress, contribution : contributionList}
         return res.send(response(baseResponse.SUCCESS, result));
     } catch(err){
         console.log(err);

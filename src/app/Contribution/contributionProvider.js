@@ -13,7 +13,7 @@ const contributionProvider = {
 
     retrieveWorkProgress : async (teamId) => {
         const connection = await pool.getConnection(async(conn) => conn);
-        const workProgress = await contributionDao.selectWorkProgress(connection, teamId);
+        const [workProgress] = await contributionDao.selectWorkProgress(connection, teamId);
         connection.release();
         return workProgress;
     }
