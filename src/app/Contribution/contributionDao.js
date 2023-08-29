@@ -1,7 +1,7 @@
 const contributionDao = {
     selectContributions : async(connection, teamId) => {
         const selectContributionsQuery = `
-            SELECT M.id AS user_id, CONCAT(M.student_number, ' ', M.user_name) AS name, M.picture_url, T.contribution
+            SELECT M.id AS user_id, student_number, user_name, picture_url, T.contribution
             FROM Members M
                 LEFT JOIN Team_members T
                     ON M.id = T.user_id
