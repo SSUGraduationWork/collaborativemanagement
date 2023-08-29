@@ -18,13 +18,14 @@ import java.util.Date;
 public class Minutes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long minutes_id;
+    @Column(name = "minutes_id")
+    private Long minutesId;
 
-//    @Column
-//    private Long userId;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column
-    private Long team_id;
+    @Column(name = "team_id")
+    private Long teamId;
 
     @Column
     private String date;
@@ -33,27 +34,27 @@ public class Minutes {
     @Column
     private String content;
 
-//    public void update(String title, String content, Long userId) {
-//        this.title = title;
-//        this.content = content;
-////        this.userId = userId;
-//    }
-
-    public void update(String title, String content) {
+    public void updateTitle(String title) {
         this.title = title;
+    }
+    public void updateContent(String content) {
         this.content = content;
-//        this.userId = userId;
+    }
+
+    public void updateUserId(Long user_id) {
+        this.userId = user_id;
     }
 
     public MinutesForm toDto(Minutes entity) {
         MinutesForm dto = new MinutesForm();
-        dto.setId(entity.getMinutes_id());
-//        dto.setUserId(entity.getUserId());
-        dto.setTeamId(entity.getTeam_id());
+        dto.setId(entity.getMinutesId());
+        dto.setUserId(entity.getUserId());
+        dto.setTeamId(entity.getTeamId());
         dto.setDate(entity.getDate());
         dto.setTitle(entity.getTitle());
         dto.setContent(entity.getContent());
         return dto;
     }
+
 }
 

@@ -10,8 +10,8 @@ import java.util.Optional;
 public interface MinutesRepository extends CrudRepository<Minutes, Long> {
     @Override
     ArrayList<Minutes> findAll();
-
-    Optional<Minutes> findByDate(String date);
-
     ArrayList<Minutes> findByDateLike(String date);
+    Minutes findByDate(String date);
+
+    ArrayList<Minutes> findByTeamId(Long teamId);
 }

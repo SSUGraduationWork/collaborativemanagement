@@ -20,8 +20,8 @@ public class MinutesForm {
     @JsonProperty("id")
     private  Long id;
 
-//    @JsonProperty("userId")
-//    private Long userId;
+    @JsonProperty("userId")
+    private Long userId;
 
     @JsonProperty("teamId")
     private Long teamId;
@@ -36,9 +36,9 @@ public class MinutesForm {
     // dto -> entity 연결
     public Minutes toEntity(MinutesForm dto) {
         Minutes entity = new Minutes();
-        entity.setMinutes_id(dto.getId());
-//        entity.setUserId(dto.getUserId());
-        entity.setTeam_id(dto.getTeamId());
+        entity.setMinutesId(dto.getId());
+        entity.setUserId(dto.getUserId());
+        entity.setTeamId(dto.getTeamId());
         entity.setDate(dto.getDate());
         entity.setTitle(dto.getTitle());
         entity.setContent(dto.getContent());
