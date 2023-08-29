@@ -18,6 +18,6 @@ app.use(cors());
 
 require('../src/app/Work/workRoute')(app);
 require('../src/app/Contribution/contributionRoute')(app);
-//require('../src/app/Header/headerRoute')(app);
+require('../src/app/Header/headerRoute')(app);
 
 module.exports = app;

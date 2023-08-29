@@ -30,7 +30,7 @@ module.exports = {
     USER_NICKNAME_EMPTY : { "isSuccess": false, "code": 400, "message": "변경할 닉네임 값을 입력해주세요" },
 
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 400, "message": "회원 상태값을 입력해주세요" },
-
+    NOT_MATCH : {"isSuccess": false, "code": 400, "message": "수정 내용이 존재하지 않거나 잘못된 요청입니다."},
     // Response error
     SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 400, "message":"중복된 이메일입니다." },
     SIGNUP_REDUNDANT_NICKNAME : { "isSuccess": false, "code": 400, "message":"중복된 닉네임입니다." },
