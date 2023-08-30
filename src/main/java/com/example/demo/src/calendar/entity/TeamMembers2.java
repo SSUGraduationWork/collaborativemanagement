@@ -12,7 +12,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @Setter
 @Table(name = "Team_members")
-public class TeamMembers {
+public class TeamMembers2 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "team_member_id")

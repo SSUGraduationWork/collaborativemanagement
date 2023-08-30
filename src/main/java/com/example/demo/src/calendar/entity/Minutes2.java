@@ -11,7 +11,8 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-public class Minutes {
+@Table(name="Minutes")
+public class Minutes2 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "minutes_id")
@@ -41,7 +42,7 @@ public class Minutes {
         this.userId = user_id;
     }
 
-    public MinutesForm toDto(Minutes entity) {
+    public MinutesForm toDto(Minutes2 entity) {
         MinutesForm dto = new MinutesForm();
         dto.setId(entity.getMinutesId());
         dto.setUserId(entity.getUserId());

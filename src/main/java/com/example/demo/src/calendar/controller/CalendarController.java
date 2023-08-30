@@ -1,8 +1,12 @@
 package com.example.demo.src.calendar.controller;
 
 import com.example.demo.src.calendar.Exception.*;
-import com.example.demo.src.calendar.dto.*;
-import com.example.demo.src.calendar.entity.*;
+import com.example.demo.src.calendar.dto.MinutesForm;
+import com.example.demo.src.calendar.dto.ProjectsForm;
+import com.example.demo.src.calendar.dto.TeamsForm;
+import com.example.demo.src.calendar.entity.Minutes2;
+import com.example.demo.src.calendar.entity.Projects2;
+import com.example.demo.src.calendar.entity.Teams2;
 import com.example.demo.src.calendar.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +50,7 @@ public class CalendarController {
     }
 
     //회의록에서는 팀멤버임을 확인했다고 가정한 후의 API: team member임을 확인하는 과정 X
-    //1: Calendar Minutes
+    //1: Calendar Minutes2
     //1-1. 회의록 생성: 해당 날짜의 회의록이 존재할 경우 해당 회의록 보여주기
     @PostMapping("/calendars/minutes")
     public ResponseEntity<ResponseData> createMinutes(@RequestBody MinutesForm form) {
@@ -69,13 +73,13 @@ public class CalendarController {
 
         //3. DB에 해당 date의 회의록이 존재하는지 여부에 따라 다르게 처리
         boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
-        if (check == false) {                                     //Minutes DB에 해당 date 존재하지 않을 경우, 해당 정보로 minutes 생성
-            Minutes target = dashboardService.createMinutes(form);
+        if (check == false) {                                     //Minutes2 DB에 해당 date 존재하지 않을 경우, 해당 정보로 minutes 생성
+            Minutes2 target = dashboardService.createMinutes(form);
             ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
         }
-        else {                                                    //Minutes DB에 해당 date 존재할 경우, 기존의 minutes 보여줌
-            Minutes original = dashboardService.getExistingMinutes(form.getDate());
+        else {                                                    //Minutes2 DB에 해당 date 존재할 경우, 기존의 minutes 보여줌
+            Minutes2 original = dashboardService.getExistingMinutes(form.getDate());
             ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", original);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
         }
@@ -88,11 +92,11 @@ public class CalendarController {
         //userId가 해당팀의 멤버인지 확인
 
         //전체 조회
-        List<Minutes> minutesList = dashboardService.watchAll(teamId);
-        if (minutesList.isEmpty()) {
+        List<Minutes2> minutes2List = dashboardService.watchAll(teamId);
+        if (minutes2List.isEmpty()) {
             return null;
         }
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutesList);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -104,11 +108,11 @@ public class CalendarController {
 
 
         // 부분 조회
-        List<Minutes> minutesList = dashboardService.watchDates(teamId, yearMonth);
-        if (minutesList == null) {
+        List<Minutes2> minutes2List = dashboardService.watchDates(teamId, yearMonth);
+        if (minutes2List == null) {
             return null;
         }
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutesList);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -119,10 +123,10 @@ public class CalendarController {
         //userId가 해당팀의 멤버인지 확인
 
         //세부 조회
-        Minutes minutes = dashboardService.watchDate(date);
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes);
+        Minutes2 minutes2 = dashboardService.watchDate(date);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes2);
 
-        log.info("get minutes: ",minutes);
+        log.info("get minutes2: ", minutes2);
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -223,13 +227,13 @@ public class CalendarController {
 
         //(1)동일한 projectName이 존재하지 않을 경우, project 생성
         if (check == false) {
-            Projects projects = dashboardService.createProjects(form);
-            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects);
+            Projects2 projects2 = dashboardService.createProjects(form);
+            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
         }
-        //(2).Projects DB에 해당 projectName 존재할 경우, 기존의 Projects 보여줌
+        //(2).Projects2 DB에 해당 projectName 존재할 경우, 기존의 Projects2 보여줌
         else {
-            Projects original = dashboardService.getExistingProjects(form.getProjectName());
+            Projects2 original = dashboardService.getExistingProjects(form.getProjectName());
             ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", original);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
         }
@@ -249,11 +253,11 @@ public class CalendarController {
         }
 
         //2. 조회
-        List<Projects> projectsList = dashboardService.watchProjects(professorId);
-        if (projectsList.isEmpty()) {
+        List<Projects2> projects2List = dashboardService.watchProjects(professorId);
+        if (projects2List.isEmpty()) {
             return null;
         }
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projectsList);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -266,7 +270,7 @@ public class CalendarController {
             throw new FormatBadRequestException("Fill In All");
         }
 
-        //2. Members 테이블에 존재하는지 + role이 학생인지 확인
+        //2. Members2 테이블에 존재하는지 + role이 학생인지 확인
         boolean membercheck = dashboardService.checkMember(userId);
         if (membercheck == false) {
             throw new MemberNotFoundException("Member Not Found");
@@ -290,12 +294,12 @@ public class CalendarController {
         }
 
         //1. 팀생성
-        Teams teams = dashboardService.createTeams(form);
+        Teams2 teams2 = dashboardService.createTeams(form);
         //2. 팀멤버 테이블 추가
-        dashboardService.createTeamsMembers(teams.getTeamId(), userId);
+        dashboardService.createTeamsMembers(teams2.getTeamId(), userId);
 
         //3. 프로젝트와 팀 count 1씩
-        Teams target = dashboardService.countNums(teams.getTeamId(), teams.getProjectId());
+        Teams2 target = dashboardService.countNums(teams2.getTeamId(), teams2.getProjectId());
 
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -304,7 +308,7 @@ public class CalendarController {
     //2-5. 1) 학생이 보낸 URL(team으로 직접 들어올 경우) => team_number 1 증가 + project_number 1 증가
     @PatchMapping("/dashboard/{projectId}/{teamId}/{userId}")
     public ResponseEntity<ResponseData> countNumbers(@PathVariable Long projectId, @PathVariable Long teamId, @PathVariable Long userId) {
-        //1. Members 테이블에 존재하는지 + role이 학생인지 확인
+        //1. Members2 테이블에 존재하는지 + role이 학생인지 확인
         boolean membercheck = dashboardService.checkMember(userId);
         if (membercheck == false) {
             throw new MemberNotFoundException("Member Not Found");
@@ -331,7 +335,7 @@ public class CalendarController {
             //1. 팀멤버 테이블에 추가
             dashboardService.createTeamsMembers(teamId, userId);
             //2. teamnumber, projectnumber 1씩 증가
-            Teams target = dashboardService.countNums(teamId, projectId);    //team_number 1 증가 + project_number 1 증가
+            Teams2 target = dashboardService.countNums(teamId, projectId);    //team_number 1 증가 + project_number 1 증가
 
             ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -361,11 +365,11 @@ public class CalendarController {
         }
 
         //3. 처리
-        List<Teams> teamsList = dashboardService.watchTeamsByPro(projectId);
-        if (teamsList.isEmpty()) {
+        List<Teams2> teams2List = dashboardService.watchTeamsByPro(projectId);
+        if (teams2List.isEmpty()) {
             return null;
         }
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teamsList);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teams2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -383,8 +387,8 @@ public class CalendarController {
             throw new MemberNotFoundException("Not Professor");
         }
         //3. 처리
-        List<Teams> teamsList = dashboardService.watchTeamsByStu(id);
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teamsList);
+        List<Teams2> teams2List = dashboardService.watchTeamsByStu(id);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teams2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

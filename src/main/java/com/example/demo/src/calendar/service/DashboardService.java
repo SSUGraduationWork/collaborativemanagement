@@ -17,12 +17,12 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class DashboardService {
-    private final MembersRepository membersRepository;
-    private final ProjectsRepository projectsRepository;
-    private final TeamsRepository teamsRepository;
+    private final Members2Repository members2Repository;
+    private final Projects2Repository projects2Repository;
+    private final Teams2Repository teams2Repository;
 
-    private final TeamMembersRepository teamMembersRepository;
-    private  final MinutesRepository minutesRepository;
+    private final TeamMembers2Repository teamMembers2Repository;
+    private  final Minutes2Repository minutes2Repository;
 
     //확인
     //1-1. minutes not null 데이터를 모두 입력받았는지
@@ -45,7 +45,7 @@ public class DashboardService {
     @Transactional
     public boolean checkDate(String date) {
         boolean check = false;
-        if (minutesRepository.findByDate(date) != null) {
+        if (minutes2Repository.findByDate(date) != null) {
             check = true;
         }
         return check;
@@ -86,7 +86,7 @@ public class DashboardService {
     @Transactional
     public boolean checkProjectName(String projectName) {
         boolean check = false;
-        if (projectsRepository.findByProjectName(projectName) != null) {
+        if (projects2Repository.findByProjectName(projectName) != null) {
             check = true;
         }
         return check;
@@ -96,7 +96,7 @@ public class DashboardService {
     @Transactional
     public boolean checkProjectId(Long projectId) {
         boolean check = false;
-        if (projectsRepository.findById(projectId) != null) {
+        if (projects2Repository.findById(projectId) != null) {
             check = true;
         }
         return check;
@@ -105,7 +105,7 @@ public class DashboardService {
     @Transactional
     public boolean checkTeam(Long teamId) {
         boolean check = false;
-        if (teamsRepository.findById(teamId) != null) {
+        if (teams2Repository.findById(teamId) != null) {
             check = true;
         }
         return check;
@@ -113,7 +113,7 @@ public class DashboardService {
     @Transactional
     public boolean checkTeamName(String teamName) {
         boolean check = false;
-        if (teamsRepository.findByTeamName(teamName) != null) {
+        if (teams2Repository.findByTeamName(teamName) != null) {
             check = true;
         }
         return check;
@@ -125,7 +125,7 @@ public class DashboardService {
     @Transactional
     public boolean checkTeamMember(Long teamId, Long userId) {
         boolean check = false;
-        if (teamMembersRepository.findByTeamIdAndUserId(teamId, userId) != null) {
+        if (teamMembers2Repository.findByTeamIdAndUserId(teamId, userId) != null) {
             check = true;
         }
         return check;
@@ -135,7 +135,7 @@ public class DashboardService {
     @Transactional
     public boolean checkMember(Long userId) {
         boolean check = false;
-        if (membersRepository.findById(userId) != null) {
+        if (members2Repository.findById(userId) != null) {
             check = true;
         }
         return check;
@@ -144,190 +144,190 @@ public class DashboardService {
     @Transactional
     public String checkRole(Long userId) {
         String check = "";
-        Members members = membersRepository.findById(userId).orElse(null);
-        check = members.getRole();
+        Members2 members2 = members2Repository.findById(userId).orElse(null);
+        check = members2.getRole();
         return check;
     }
 
     //3. 기능
     //minutes
     @Transactional
-    public Minutes getExistingMinutes(String date) {
-        Minutes original = minutesRepository.findByDate(date);
+    public Minutes2 getExistingMinutes(String date) {
+        Minutes2 original = minutes2Repository.findByDate(date);
         return original;
     }
 
     @Transactional
-    public Minutes createMinutes(MinutesForm dto) {
+    public Minutes2 createMinutes(MinutesForm dto) {
 
-        Minutes minutes= minutesRepository.save(dto.toEntity(dto));
-        Minutes target = minutesRepository.findById(minutes.getMinutesId()).orElse(null);
+        Minutes2 minutes2 = minutes2Repository.save(dto.toEntity(dto));
+        Minutes2 target = minutes2Repository.findById(minutes2.getMinutesId()).orElse(null);
         return target;
     }
 
     @Transactional
-    public List<Minutes> watchAll(Long teamId) {
-        List<Minutes> minutesList= minutesRepository.findByTeamId(teamId);
-        return minutesList;
+    public List<Minutes2> watchAll(Long teamId) {
+        List<Minutes2> minutes2List = minutes2Repository.findByTeamId(teamId);
+        return minutes2List;
     }
 
     @Transactional
-    public List<Minutes> watchDates(Long teamId,String filterMonth) {
-        List<Minutes> target = new ArrayList<>();
-        List<Minutes> minutesList = minutesRepository.findByTeamId(teamId);
+    public List<Minutes2> watchDates(Long teamId, String filterMonth) {
+        List<Minutes2> target = new ArrayList<>();
+        List<Minutes2> minutes2List = minutes2Repository.findByTeamId(teamId);
 
-        for (Minutes minutes: minutesList) {
-            if (minutes.getDate().startsWith(filterMonth)) {
-                target.add(minutes);
+        for (Minutes2 minutes2 : minutes2List) {
+            if (minutes2.getDate().startsWith(filterMonth)) {
+                target.add(minutes2);
             }
         }
         return target;
     }
     @Transactional
-    public Minutes watchDate(String date) {
-        Minutes minutes = minutesRepository.findByDate(date);
-        return minutes;
+    public Minutes2 watchDate(String date) {
+        Minutes2 minutes2 = minutes2Repository.findByDate(date);
+        return minutes2;
     }
     @Transactional
     public MinutesForm editMinutes(String date, MinutesForm dto) {
         //현재 입력한 date가 repository에 존재할 경우 edit. orElseThrow()
-        Minutes minutes = minutesRepository.findByDate(date);
+        Minutes2 minutes2 = minutes2Repository.findByDate(date);
         if (dto.getTitle() != null) {
-            minutes.updateTitle(dto.getTitle());
+            minutes2.updateTitle(dto.getTitle());
         }
 
         if (dto.getContent() != null) {
-            minutes.updateContent(dto.getContent());
+            minutes2.updateContent(dto.getContent());
         }
 
-        if (dto.getUserId() != minutes.getUserId()) {
-            minutes.updateUserId(dto.getUserId());
+        if (dto.getUserId() != minutes2.getUserId()) {
+            minutes2.updateUserId(dto.getUserId());
         }
-        MinutesForm dtotarget = minutes.toDto(minutes);
+        MinutesForm dtotarget = minutes2.toDto(minutes2);
         return dtotarget;
     }
 
     @Transactional
     public void deleteMinutes(String date) {
-        Minutes minutes = minutesRepository.findByDate(date);
-        minutesRepository.delete(minutes);
+        Minutes2 minutes2 = minutes2Repository.findByDate(date);
+        minutes2Repository.delete(minutes2);
     }
 
     //프로젝트+팀
     @Transactional
-    public List<Members> watchMembers() {
-        return membersRepository.findAll();
+    public List<Members2> watchMembers() {
+        return members2Repository.findAll();
     }
 
     @Transactional
-    public List<Projects> watchProjects() {
-        return projectsRepository.findAll();
+    public List<Projects2> watchProjects() {
+        return projects2Repository.findAll();
     }
 
     @Transactional
-    public List<Teams> watchTeams() {
-        return teamsRepository.findAll();
+    public List<Teams2> watchTeams() {
+        return teams2Repository.findAll();
     }
 
     @Transactional
-    public Projects getExistingProjects(String projectName) {
-        Projects original = projectsRepository.findByProjectName(projectName);
+    public Projects2 getExistingProjects(String projectName) {
+        Projects2 original = projects2Repository.findByProjectName(projectName);
         return original;
     }
 
     @Transactional
-    public Projects createProjects(ProjectsForm dto) {
-        Projects projects = projectsRepository.save(dto.toEntity(dto));
-        return projects;
+    public Projects2 createProjects(ProjectsForm dto) {
+        Projects2 projects2 = projects2Repository.save(dto.toEntity(dto));
+        return projects2;
     }
 
     @Transactional
-    public List<Projects> watchProjects(Long professor_id) {
-        List<Projects> projectsList = projectsRepository.findByProfessorId(professor_id);
-        return projectsList;
+    public List<Projects2> watchProjects(Long professor_id) {
+        List<Projects2> projects2List = projects2Repository.findByProfessorId(professor_id);
+        return projects2List;
     }
 
     @Transactional
-    public Teams createTeams(TeamsForm dto) {
-        Teams teams = teamsRepository.save(dto.toEntity(dto));
-        return teams;
+    public Teams2 createTeams(TeamsForm dto) {
+        Teams2 teams2 = teams2Repository.save(dto.toEntity(dto));
+        return teams2;
     }
 
 
 //    //팀멤버테이블에 추가 -> 미완성
     @Transactional
     public void createTeamsMembers(Long teamId, Long userId) {
-        TeamMembers teamMembers = new TeamMembers();
-        teamMembers.setTeamId(teamId);
-        teamMembers.setUserId(userId);
-        teamMembers.setContribution(0L);
+        TeamMembers2 teamMembers2 = new TeamMembers2();
+        teamMembers2.setTeamId(teamId);
+        teamMembers2.setUserId(userId);
+        teamMembers2.setContribution(0L);
 
-        teamMembersRepository.save(teamMembers);
+        teamMembers2Repository.save(teamMembers2);
     }
 
     @Transactional
-    public Teams countNums(Long teamId, Long projectId) {
-        Projects projects = projectsRepository.findById(projectId).orElse(null);
-        projects.setProjectNumber(projects.getProjectNumber() + 1);
-        Teams teams = teamsRepository.findByTeamIdAndProjectId(teamId, projectId);
-        teams.setTeamNumber(teams.getTeamNumber() + 1);
-        return teams;
+    public Teams2 countNums(Long teamId, Long projectId) {
+        Projects2 projects2 = projects2Repository.findById(projectId).orElse(null);
+        projects2.setProjectNumber(projects2.getProjectNumber() + 1);
+        Teams2 teams2 = teams2Repository.findByTeamIdAndProjectId(teamId, projectId);
+        teams2.setTeamNumber(teams2.getTeamNumber() + 1);
+        return teams2;
     }
 
     @Transactional
-    public List<Teams> watchTeamsByPro(Long projectId) {
-        List<Teams> teamsList = teamsRepository.findByProjectId(projectId);
-        return teamsList;
+    public List<Teams2> watchTeamsByPro(Long projectId) {
+        List<Teams2> teams2List = teams2Repository.findByProjectId(projectId);
+        return teams2List;
     }
 
     @Transactional
-    public List<Teams> watchTeamsByStu(Long id) {
+    public List<Teams2> watchTeamsByStu(Long id) {
         List<Long> teamsId = new ArrayList<>();
-        List<Teams> teamsList = new ArrayList<>();
+        List<Teams2> teams2List = new ArrayList<>();
 
-        List<TeamMembers> teamMembersList = teamMembersRepository.findByUserId(id);
+        List<TeamMembers2> teamMembers2List = teamMembers2Repository.findByUserId(id);
 
-        int cnt = teamMembersList.size();
+        int cnt = teamMembers2List.size();
 
         for (int i=0; i<cnt; i++) {
-            TeamMembers teamMembers = teamMembersList.get(i); //객체 전체 선택
-            teamsId.add(teamMembers.getTeamId());             //각 객체에서 teamId만 teamsId에 넣기
+            TeamMembers2 teamMembers2 = teamMembers2List.get(i); //객체 전체 선택
+            teamsId.add(teamMembers2.getTeamId());             //각 객체에서 teamId만 teamsId에 넣기
         }
         log.info("teamsId:"+ teamsId);
 
         int count = teamsId.size();
 
         for (int j=0; j<count; j++) {
-            Teams teams = teamsRepository.findById(teamsId.get(j)).orElse(null);
-            teamsList.add(teams);
+            Teams2 teams2 = teams2Repository.findById(teamsId.get(j)).orElse(null);
+            teams2List.add(teams2);
         }
 
-        log.info("teamsList:"+ teamsList);
-        return teamsList;
+        log.info("teams2List:"+ teams2List);
+        return teams2List;
     }
 
     @Transactional
     public boolean matchProfessorAndProject(Long professorId, Long projectId) {
         boolean check = false;
-        Projects projects = projectsRepository.findByProfessorIdAndId(professorId, projectId);
-        if (projects != null) {
+        Projects2 projects2 = projects2Repository.findByProfessorIdAndId(professorId, projectId);
+        if (projects2 != null) {
             check = true;
         }
         return check;
     }
 
 //    @Transactional
-//    public TeamMembers addTeamMember(Long projectId ,Long teamId, Long userId) {
-//        TeamMembers entity = new TeamMembers();
+//    public TeamMembers2 addTeamMember(Long projectId ,Long teamId, Long userId) {
+//        TeamMembers2 entity = new TeamMembers2();
 //        entity.setTeamId(teamId);
 //        entity.setUserId(userId);
-//        teamMembersRepository.save(entity);
+//        teamMembers2Repository.save(entity);
 //        return entity;
 //    }
 
 //    @Transactional
-//    public List<Teams> getTeamsInProjects(Long projectId) {
-//        Projects projects = projectsRepository.findByProjectId(projectId);
+//    public List<Teams2> getTeamsInProjects(Long projectId) {
+//        Projects2 projects = projects2Repository.findByProjectId(projectId);
 //        log.info(projects.toString());
 //        log.info(projects.getTeams().toString());
 //        if (projects != null) {

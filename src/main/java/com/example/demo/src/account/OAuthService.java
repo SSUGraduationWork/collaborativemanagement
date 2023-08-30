@@ -1,25 +1,22 @@
 package com.example.demo.src.account;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.config.BaseResponseStatus;
-import com.example.demo.config.Constant.*;
+import com.example.demo.config.Constant.SocialLoginType;
 import com.example.demo.src.account.dto.GetSocialOAuthRes;
 import com.example.demo.src.account.dto.GoogleOAuthToken;
 import com.example.demo.src.account.dto.GoogleUser;
 import com.example.demo.src.account.entity.Member;
-import com.example.demo.src.account.repository.MemberRepository;
 import com.example.demo.utils.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.security.core.parameters.P;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import static com.example.demo.config.BaseResponseStatus.*;
+import static com.example.demo.config.BaseResponseStatus.SERVER_ERROR;
 
 @Service
 @AllArgsConstructor

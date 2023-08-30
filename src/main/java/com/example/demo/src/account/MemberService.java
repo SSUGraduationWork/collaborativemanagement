@@ -1,8 +1,5 @@
 package com.example.demo.src.account;
 
-import com.example.demo.config.BaseException;
-import com.example.demo.config.BaseResponseStatus;
-import com.example.demo.src.account.dto.GetSocialOAuthRes;
 import com.example.demo.src.account.dto.MemberDto;
 import com.example.demo.src.account.dto.PostMemberRes;
 import com.example.demo.src.account.entity.Member;

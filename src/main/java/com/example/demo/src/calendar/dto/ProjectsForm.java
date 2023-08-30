@@ -1,6 +1,6 @@
 package com.example.demo.src.calendar.dto;
 
-import com.example.demo.src.calendar.entity.Projects;
+import com.example.demo.src.calendar.entity.Projects2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -25,8 +25,8 @@ public class ProjectsForm {
     private Long projectNumber;
 
     // dto -> entity 연결
-    public Projects toEntity(ProjectsForm dto) {
-        Projects entity = new Projects();
+    public Projects2 toEntity(ProjectsForm dto) {
+        Projects2 entity = new Projects2();
         entity.setId(dto.getId());
         entity.setProfessorId(dto.getProfessorId());
         entity.setProjectName(dto.getProjectName());

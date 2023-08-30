@@ -9,7 +9,8 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-public class Teams {
+@Table(name="Teams")
+public class Teams2 {
     @Id
     @Column(name = "team_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +28,10 @@ public class Teams {
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "project_id")
-//    private Projects projects;
+//    private Projects2 projects;
 //
 //
-//    public void setProjects(Projects projects) {
+//    public void setProjects(Projects2 projects) {
 //        this.projects = projects;
 //    }
 }

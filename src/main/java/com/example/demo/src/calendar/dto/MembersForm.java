@@ -1,6 +1,6 @@
 package com.example.demo.src.calendar.dto;
 
-import com.example.demo.src.calendar.entity.Members;
+import com.example.demo.src.calendar.entity.Members2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -36,8 +36,8 @@ public class MembersForm {
     @JsonProperty("pictureUrl")
     private String pictureUrl;
 
-    public Members toEntity(MembersForm dto) {
-        Members entity = new Members();
+    public Members2 toEntity(MembersForm dto) {
+        Members2 entity = new Members2();
         entity.setUser_email(dto.getUserId());
         entity.setUser_name(dto.getUserName());
         entity.setRole(dto.getRole());

@@ -9,7 +9,8 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-public class Projects {
+@Table(name="Projects")
+public class Projects2 {
     @Id
     @Column(name = "project_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +29,9 @@ public class Projects {
     private Long projectNumber;
 
 //    @OneToMany(mappedBy = "projects")
-//    private List<Teams> teamsList;
+//    private List<Teams2> teamsList;
 //
-//    public List<Teams> getTeams() {
+//    public List<Teams2> getTeams() {
 //        return teamsList;
 //    }
 }

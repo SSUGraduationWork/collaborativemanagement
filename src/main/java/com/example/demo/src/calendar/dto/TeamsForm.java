@@ -1,6 +1,6 @@
 package com.example.demo.src.calendar.dto;
 
-import com.example.demo.src.calendar.entity.Teams;
+import com.example.demo.src.calendar.entity.Teams2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -22,8 +22,8 @@ public class TeamsForm {
     private Long teamNumber;
 
 
-    public Teams toEntity(TeamsForm dto) {
-        Teams entity = new Teams();
+    public Teams2 toEntity(TeamsForm dto) {
+        Teams2 entity = new Teams2();
         entity.setTeamId(dto.getTeamId());
         entity.setProjectId(dto.getProjectId());
         entity.setTeamName(dto.getTeamName());

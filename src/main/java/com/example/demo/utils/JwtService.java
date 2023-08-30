@@ -13,7 +13,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.security.Key;
 import java.util.Date;
 
-import static com.example.demo.config.BaseResponseStatus.*;
+import static com.example.demo.config.BaseResponseStatus.EMPTY_JWT;
+import static com.example.demo.config.BaseResponseStatus.INVALID_JWT;
 
 @Service
 public class JwtService {

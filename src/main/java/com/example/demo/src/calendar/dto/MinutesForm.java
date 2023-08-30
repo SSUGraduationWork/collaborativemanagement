@@ -1,6 +1,6 @@
 package com.example.demo.src.calendar.dto;
 
-import com.example.demo.src.calendar.entity.Minutes;
+import com.example.demo.src.calendar.entity.Minutes2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -28,8 +28,8 @@ public class MinutesForm {
 
 
     // dto -> entity 연결
-    public Minutes toEntity(MinutesForm dto) {
-        Minutes entity = new Minutes();
+    public Minutes2 toEntity(MinutesForm dto) {
+        Minutes2 entity = new Minutes2();
         entity.setMinutesId(dto.getId());
         entity.setUserId(dto.getUserId());
         entity.setTeamId(dto.getTeamId());

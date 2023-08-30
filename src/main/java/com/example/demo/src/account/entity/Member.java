@@ -10,7 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "Members")
+@Table(name = "Members2")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
