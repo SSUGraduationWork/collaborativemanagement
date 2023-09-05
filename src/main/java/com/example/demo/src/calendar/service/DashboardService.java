@@ -185,8 +185,22 @@ public class DashboardService {
     }
     @Transactional
     public Minutes2 watchDate(String date) {
+
         Minutes2 minutes2 = minutes2Repository.findByDate(date);
         return minutes2;
+    }
+
+    @Transactional
+    public Minutes2 findMinute(Long teamId, String date) {
+        Minutes2 target = null;
+        List<Minutes2> minutes2List = minutes2Repository.findByTeamId(teamId);
+
+        for (Minutes2 minutes2 : minutes2List) {
+            if (minutes2.getDate().equals(date)) {
+                target = minutes2;
+            }
+        }
+        return target;
     }
     @Transactional
     public MinutesForm editMinutes(String date, MinutesForm dto) {

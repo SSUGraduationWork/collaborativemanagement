@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -121,13 +122,12 @@ public class CalendarController {
     //조회할 것이 없을 경우 null 출력
     @GetMapping("/calendars/minutes/{teamId}/{date}/{userId}")
     public ResponseEntity<ResponseData> getMinutes(@PathVariable Long teamId, @PathVariable String date, @PathVariable Long userId) {
-        //userId가 해당팀의 멤버인지 확인
 
-        //세부 조회
-        Minutes2 minutes2 = dashboardService.watchDate(date);
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes2);
+        //해당 teamId의 회의록 모두 찾기
+        Minutes2 minute= dashboardService.findMinute(teamId, date);
+        log.info("get minutes2: ", minute);
 
-        log.info("get minutes2: ", minutes2);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minute);
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
