@@ -37,26 +37,18 @@ public class AccountController {
             GetSocialOAuthRes getSocialOAuthRes = oauthService.oAuthLogin(socialLoginType, code);
             return new BaseResponse<>(getSocialOAuthRes);
         } catch(BaseException exception){
+            System.out.println(exception);
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     @PostMapping("/signup")
-    public BaseResponse<PostMemberRes> signUp (HttpServletRequest request, @RequestBody MemberDto memberDto) {
+    public BaseResponse<PostMemberRes> signUp (@RequestBody MemberDto memberDto) {
 
-        HttpSession session = request.getSession();
-        String email = (String) session.getAttribute("email");
-        String pictureUrl = (String) session.getAttribute("pictureUrl");
+        PostMemberRes postMemberRes = memberService.registerUser(memberDto);
 
-        if (email != null) {
-            memberDto.setUser_email(email);
-            memberDto.setPicture_url(pictureUrl);
-            PostMemberRes postMemberRes = memberService.registerUser(memberDto);
-            if (postMemberRes != null) return new BaseResponse<>(postMemberRes);
-            else return new BaseResponse<>(POST_USERS_EXISTS_EMAIL);
-        } else {
-            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
-        }
+        if (postMemberRes != null) return new BaseResponse<>(postMemberRes);
+        else return new BaseResponse<>(POST_USERS_EXISTS_EMAIL);
     }
 
 }

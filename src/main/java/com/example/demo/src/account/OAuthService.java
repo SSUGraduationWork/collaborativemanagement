@@ -55,7 +55,7 @@ public class OAuthService {
                     GoogleUser googleUser = googleOauth.getUserInfo(userInfoResponse);
 
                     String user_email = googleUser.getEmail();
-
+                    String picture_url = googleUser.getPicture();
                     //우리 서버의 db와 대조하여 해당 User가 존재하는지 확인
                     Member member = memberService.getUser(user_email);
 
@@ -63,10 +63,11 @@ public class OAuthService {
                         Long user_id = member.getId();
                         String role = member.getRole();
                         String jwtToken = jwtService.createJwt(user_id, role);
-                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(jwtToken, user_id);
+                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(jwtToken, user_id, user_email, picture_url);
                         return getSocialOAuthRes;
                     } else {
-                        redirectToSignUp(request, response, googleUser);
+                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(null, null, user_email, picture_url);
+                        return getSocialOAuthRes;
                     }
                 }
                 default: {
@@ -74,21 +75,8 @@ public class OAuthService {
                 }
             }
         }catch(Exception exception){
+            System.out.println(exception);
             throw new BaseException(SERVER_ERROR);
         }
-    }
-
-    public void redirectToSignUp(HttpServletRequest request, HttpServletResponse response, GoogleUser googleUser) throws IOException {
-        // 데이터 생성
-        String email =  googleUser.getEmail();
-        String picture_url = googleUser.getPicture();
-
-        // 세션에 데이터 저장
-        HttpSession session = request.getSession();
-        session.setAttribute("email", email);
-        session.setAttribute("pictureUrl", picture_url);
-
-        // Redirect 수행
-        response.sendRedirect("/accounts/signup");
     }
 }
