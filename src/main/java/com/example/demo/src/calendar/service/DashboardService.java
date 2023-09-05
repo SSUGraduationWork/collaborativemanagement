@@ -315,6 +315,13 @@ public class DashboardService {
         }
         return check;
     }
+    @Transactional
+    public String findProjectName(Long projectId) {
+        Projects2 projects2 = projects2Repository.findById(projectId).orElse(null);
+        String projectName = projects2.getProjectName();
+
+        return projectName;
+    }
 
 //    @Transactional
 //    public TeamMembers2 addTeamMember(Long projectId ,Long teamId, Long userId) {
