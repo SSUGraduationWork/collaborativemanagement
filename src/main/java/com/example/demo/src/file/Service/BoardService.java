@@ -28,39 +28,10 @@ public class BoardService {
     private AlarmRepository alarmRepository;
     private FileRepository fileRepository;
 
-    //글 작성
-    public BoardResponse write(BoardWriteRequest request,Long memberId,Long teamId, Long workId, MultipartFile file) throws Exception{
-        //게시판 등록
-        String projectPath=System.getProperty("user.dir")+ "\\src\\main\\resources\\static\\files";
-        Members members = membersRepository.findById(memberId).get();
-        Teams teams = teamRepository.findById(teamId).get();
-        Works works = workRepository.findById(workId).get();
-        UUID uuid= UUID.randomUUID();
-        String fileName=uuid+"_"+file.getOriginalFilename();
-        File saveFile =new File(projectPath, fileName);
-        file.transferTo(saveFile);
-
-        Boards boards =toEntity(request);
-        boards.confirmMember(members);
-        boards.confirmTeam(teams);
-        boards.confirmWork(works);
-
+    public void  increaseCount(Long boardId){
+        Boards boards = boardRepository.findById(boardId).get();
+        boards.updateViewCount(boards.getViewCnt());
         boardRepository.save(boards);
-
-
-        // 빌더를 사용하여 파일 객체 생성
-        Files file1 = Files.builder()
-                .filename(fileName)
-                .filename(file.getOriginalFilename())
-                .filepath("/files/" + fileName)
-                .build();
-        file1.confirmBoard(boards);
-        fileRepository.save(file1);
-        //멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
-        FeedbackStatusAndAlarm(boards, members,works,teams);
-
-
-        return BoardResponse.from(boards);
     }
 
     //글 작성
@@ -78,21 +49,23 @@ public class BoardService {
 
         boardRepository.save(boards);
         // Save all uploaded files
-        for (MultipartFile file : files) {
-            UUID uuid = UUID.randomUUID();
-            String fileName = uuid + "_" + file.getOriginalFilename();
-            File saveFile = new File(projectPath, fileName);
-            file.transferTo(saveFile);
+        if (files != null) {
+            for (MultipartFile file : files) {
+                UUID uuid = UUID.randomUUID();
+                String fileName = uuid + "_" + file.getOriginalFilename();
+                File saveFile = new File(projectPath, fileName);
+                file.transferTo(saveFile);
 
 
-            // 빌더를 사용하여 파일 객체 생성
-            Files file1 = Files.builder()
-                    .filename(fileName)
-                    .filepath("/files/" + fileName)
-                    .build();
-            file1.confirmBoard(boards);
-            fileRepository.save(file1);
+                // 빌더를 사용하여 파일 객체 생성
+                Files file1 = Files.builder()
+                        .filename(fileName)
+                        .filepath("/files/" + fileName)
+                        .build();
+                file1.confirmBoard(boards);
+                fileRepository.save(file1);
 
+            }
         }
         // 멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
         FeedbackStatusAndAlarm(boards, members, works,teams);
@@ -161,6 +134,8 @@ public class BoardService {
     }
 
 
+
+
     // 게시글 리스트 처리
     public List<BoardResponse> boardList(Long memberId, Long teamId) {
         // memberId를 사용하여 해당 멤버의 알람 리스트를 가져옴
@@ -169,37 +144,27 @@ public class BoardService {
         // memberId와 teamId에 해당하는 게시글 리스트 조회
         // teamId로 해당 팀의 게시글 리스트 조회
         List<Boards> boardsList = boardRepository.findAllByTeamsId(teamId);
-
+        List<FeedbackStatuses> feedbackStatusesList=feedbackStatusRepository.findByUsersIdAndTeamsId(memberId,teamId);
+        int length = boardsList.size();
+        int length1=feedbackStatusesList.size();
+        System.out.println("리스트의 길이는 " + length + "입니다.");
+        System.out.println("리스트의 길이는 " + length1 + "입니다.");
         List<BoardResponse> boardResponses = new ArrayList<>();
 
-        for (Boards boards : boardsList) {
-
-            List<FeedbackStatuses> feedbackStatusList = boards.getFeedbackStatusList();
-            BoardResponse boardResponse = BoardResponse.from(boards);
-            //boards 하나에 대한 feedbackStatus, 에러 발생
-          // List<FeedbackStatuses> feedbackStatusList = feedbackStatusRepository.findByBoardsAndUsers(boards,member);
-            //본인이 쓴 게시판이면 기본적으로 피드백 안해도 됨
-            if(boards.getUsers().getId().equals(memberId)){
-                boardResponse.setFeedbackYn(true);
-            }
-
-            for(FeedbackStatuses feedbackStatus: feedbackStatusList ){
-                //본인이 쓴 게시판이 아닌 경우
-                    boardResponse.setFeedbackYn(feedbackStatus.isFeedbackYn());
-            }
+        for (int i = 0; i < length; i++) {
+            Boards board = boardsList.get(i);
+            FeedbackStatuses feedbackStatus=feedbackStatusesList.get(i);
+            BoardResponse boardResponse = BoardResponse.from(board);
+            boardResponse.setFeedbackYn(feedbackStatus.isFeedbackYn());
             boardResponses.add(boardResponse);
         }
         return boardResponses;
     }
 
 
-
-
-
     //특정 게시글 불러오기
     public BoardDetailResponse boardView(Long id){
         Boards boards = boardRepository.findById(id).get();
-        boards.updateViewCount(boards.getViewCnt());
         return BoardDetailResponse.from(boards);
     }
 
@@ -210,14 +175,15 @@ public class BoardService {
     //추후에 수정요청을 한 사람에게만 알람이 가도록, 그리고 수정요청을 받지 않더라도 글 작성자가
     //게시글을 수정하고 싶을 경우에도 생각해야함.
     //다중 파일 글 재작성
-    public BoardResponse multiReWrite(Long boardId,BoardWriteRequest request, MultipartFile[] files) throws Exception{
+    public BoardResponse multiReWrite(Long boardId,Long workId,BoardWriteRequest request, MultipartFile[] files) throws Exception{
         String projectPath=System.getProperty("user.dir")+ "\\src\\main\\resources\\static\\files";
 
         Boards boards = boardRepository.findById(boardId).get();
+        Works works = workRepository.findById(workId).get();
+        boards.setWorks(works);
 
         boards.setTitle(request.getTitle());
         boards.setContent(request.getContent());
-
 
 
         // 새로 업로드 될 파일
@@ -240,9 +206,6 @@ public class BoardService {
         }
 
 
-        //조회수 증가 로직
-        boards.updateViewCount(boards.getViewCnt());
-
         boardRepository.save(boards);
 
         //if(mod_compl==true)
@@ -253,51 +216,6 @@ public class BoardService {
 
 
 
-    //단일 파일 글 재작성
-    public BoardResponse reWrite(Long boardId,BoardWriteRequest request, MultipartFile file, boolean mod_compl) throws Exception{
-        String projectPath=System.getProperty("user.dir")+ "\\src\\main\\resources\\static\\files";
-
-        //Members members = memberRepository.findById(memberId).get();
-       // Teams teams = teamRepository.findById(teamId).get();
-        //Works works = workRepository.findById(workId).get();
-        Boards boards = boardRepository.findById(boardId).get();
-
-        UUID uuid= UUID.randomUUID();
-        String fileName=uuid+"_"+file.getOriginalFilename();
-        File saveFile =new File(projectPath, fileName);
-        file.transferTo(saveFile);
-        boards.setTitle(request.getTitle());
-        boards.setContent(request.getContent());
-
-        List<Files> fileList = boards.getFileList();
-
-        // 파일 리스트가 비어있지 않은 경우에만 첫 번째 파일을 가져옴
-        if (!fileList.isEmpty()) {
-            Files firstFile = fileList.get(0);
-            // 첫 번째 파일에 대한 로직 처리
-
-            //기존에 저장되어 있던 파일들은 지우고 시작
-            OneDeletePhotoFromFileSystem(firstFile);
-        }
-
-        // 빌더를 사용하여 파일 객체 생성
-        Files files = Files.builder()
-                .filename(fileName)
-                .filename(file.getOriginalFilename())
-                .filepath("/files/" + fileName)
-                .build();
-        files.confirmBoard(boards);
-        //조회수 증가 로직
-        boards.updateViewCount(boards.getViewCnt());
-
-        boardRepository.save(boards);
-
-        if(mod_compl==true)
-        {//글작성자 제외 팀원 모두에게 알람이 가도록
-            completionAlarm(boards);
-        }
-        return BoardResponse.from(boards);
-    }
 
     public void completionAlarm(Boards boards){
         // 해당 팀에 속한 모든 멤버 가져와서 FeedbackStatuses에 추가
@@ -332,11 +250,6 @@ public class BoardService {
 
     }
 
-    //특정 파일 다운로드 할때 관련 게시판 찾기
-    public Boards boardFind(Long id){
-        Boards boards = boardRepository.findById(id).get();
-        return boards;
-    }
 
     //특정 게시글 삭제
     public void boardDelete(Long id){
@@ -402,35 +315,6 @@ public class BoardService {
             System.err.println("사진 파일 삭제 중 오류 발생: ");
         }
     }
-
-
-    private void OneDeletePhotoFromFileSystem(Files file) {
-        try {
-
-                String photoPath = file.getFilepath();
-                String projectPath = System.getProperty("user.dir");
-                File photoFile = new File(projectPath + "/src/main/resources/static/" + photoPath);
-
-
-
-                // 파일이 존재하는지 확인하고 삭제
-                if (photoFile.exists()) {
-                    if (photoFile.delete()) {
-                        System.out.println("사진 파일 삭제 성공: " + photoPath);
-                    } else {
-                        System.err.println("사진 파일 삭제 실패: " + photoPath);
-                    }
-                } else {
-                    System.err.println("해당 경로에 사진 파일이 존재하지 않습니다: " + photoPath);
-                }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("사진 파일 삭제 중 오류 발생: ");
-        }
-    }
-
 
 
 

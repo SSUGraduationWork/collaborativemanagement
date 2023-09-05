@@ -1,12 +1,11 @@
 package com.example.demo.src.file.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "Files")
 @NoArgsConstructor
 public class Files {

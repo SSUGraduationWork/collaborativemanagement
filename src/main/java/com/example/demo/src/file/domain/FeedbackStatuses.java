@@ -2,10 +2,7 @@ package com.example.demo.src.file.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
@@ -13,7 +10,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @Entity
 @Table(name = "Feedback_statuses")
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class FeedbackStatuses {
 

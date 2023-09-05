@@ -11,6 +11,7 @@ import java.util.List;
 public interface AlarmRepository extends JpaRepository<Alarms, Long> {
     // 멤버별 알람 조회를 위한 메서드 추가
     List<Alarms> findByUsers(Members member);
+    List<Alarms> findByUsersId(Long memberId);
 
 }
 

@@ -26,7 +26,7 @@ private String writerName;
 
 private boolean feedbackYn;
 
-
+private String pictureUrl;
 
 private Long userId;
 //사용자명과 작업명은 추후 추가해야함
@@ -39,7 +39,7 @@ private Long userId;
     @Builder
     public BoardResponse(Long boardId, String title, Long viewCount,
                          LocalDateTime createdTime, String workName,String writerName,
-                         boolean feedbackYn,Long userId){
+                         boolean feedbackYn,Long userId,String pictureUrl){
         this.boardId = boardId;
         this.title = title;
         this.viewCount=viewCount;
@@ -48,6 +48,7 @@ private Long userId;
         this.writerName=writerName;
         this.feedbackYn=feedbackYn;
         this.userId=userId;
+        this.pictureUrl=pictureUrl;
     }
 
     public static BoardResponse from(Boards boards) {
@@ -59,6 +60,7 @@ private Long userId;
                 .workName(boards.getWorks().getWorkName())
                 .writerName(boards.getUsers().getStudentNumber()+" "+ boards.getUsers().getUserName())
                 .userId(boards.getUsers().getId())
+                .pictureUrl(boards.getUsers().getPictureUrl())
                 .build();
     }
 }

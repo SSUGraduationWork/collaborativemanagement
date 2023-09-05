@@ -17,18 +17,20 @@ public class BoardDetailResponse {
     private String content;
     private List<String> fileDirs;
     private List<Long> fileId;
+    private String workName;
 //사용자명과 작업명은 추후 추가해야함
 //private String username;
 
 //private String workname;
 
     @Builder
-    public BoardDetailResponse(Long boardId, String title,String content,List<String> fileDirs,List<Long> fileId){
+    public BoardDetailResponse(Long boardId, String title,String content,List<String> fileDirs,List<Long> fileId,String workName){
         this.boardId = boardId;
         this.title = title;
         this.content=content;
         this.fileDirs=fileDirs;
         this.fileId=fileId;
+        this.workName=workName;
     }
 
 
@@ -36,8 +38,8 @@ public class BoardDetailResponse {
         BoardDetailResponseBuilder responseBuilder = BoardDetailResponse.builder()
                 .boardId(boards.getId())
                 .title(boards.getTitle())
-                .content(boards.getContent());
-
+                .content(boards.getContent())
+                .workName(boards.getWorks().getWorkName());
         List<String> fileDirs = new ArrayList<>();
         for (Files file : boards.getFileList()) {
             fileDirs.add(file.getFilepath());

@@ -10,7 +10,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="Feedbacks")
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class Feedbacks extends FeedbackTimeEntity {
     @Id

@@ -2,10 +2,7 @@ package com.example.demo.src.file.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -19,7 +16,8 @@ import static jakarta.persistence.CascadeType.ALL;
 @NoArgsConstructor
 @Entity
 @Table(name="Members")
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class Members  {
     @Id

@@ -4,10 +4,13 @@ import com.example.demo.src.file.FeedbackTimeEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @Table(name = "Alarms")
 @Entity
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 
 public class Alarms extends FeedbackTimeEntity {

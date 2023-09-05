@@ -12,7 +12,8 @@ import static jakarta.persistence.CascadeType.ALL;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Boards")
 @Entity
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 public class Boards extends BaseTimeEntity {

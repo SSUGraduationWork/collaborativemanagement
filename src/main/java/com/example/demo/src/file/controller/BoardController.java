@@ -32,14 +32,12 @@ public class BoardController {
 
     private final BoardService boardService;
     private FileRepository fileRepository;
-    //파일 한번에 한 개 업로드 및 게시글 작성
-   @PostMapping("/board/write/{memberId}/{teamId}/{workId}")
-    public ResponseEntity<Response<BoardResponse>> boardWriteForm(@Valid BoardWriteRequest request,
-                                                                  @PathVariable("memberId") Long memberId,
-                                                                  @PathVariable("teamId") Long teamId,
-                                                                  @PathVariable("workId") Long workId,
-                                                                  @RequestParam("file") MultipartFile file) throws Exception{
-       return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.write(request,memberId,teamId,workId,file)));
+
+    //파일 한번에 여러게 업로드 및 게시글 작성
+    @PostMapping("/board/upcount/{boardId}")
+    public void upcount( @PathVariable("boardId") Long boardId ) {
+        //조회수 증가 로직
+        boardService.increaseCount(boardId);
     }
 
     //파일 한번에 여러게 업로드 및 게시글 작성
@@ -48,8 +46,7 @@ public class BoardController {
                                                                   @PathVariable("memberId") Long memberId,
                                                                   @PathVariable("teamId") Long teamId,
                                                                   @PathVariable("workId") Long workId,
-
-                                                                  @RequestParam("files") MultipartFile[] files) throws Exception{
+                                                                  @PathVariable(value = "files", required = false) MultipartFile[] files) throws Exception{
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.multiWrite(request,memberId,teamId,workId,files)));
     }
 
@@ -67,8 +64,9 @@ public class BoardController {
 
 
     //특정 게시글 눌렀을 때 상세 페이지 생성
-    @GetMapping("/board/view/{boardId}/{memberId}")
-    public ResponseEntity<Response<BoardDetailResponse>> boardDetailView(@PathVariable("boardId") Long id,@PathVariable("memberId") Long memberId){
+    @GetMapping("/board/view/{boardId}/{memberId}/{teamId}")
+    public ResponseEntity<Response<BoardDetailResponse>> boardDetailView(@PathVariable("boardId") Long id,@PathVariable("memberId") Long memberId,
+                                                                         @PathVariable("teamId") Long teamId){
 
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.boardView(id)));
     }
@@ -93,21 +91,16 @@ public class BoardController {
     }
 
 
-    //단일 파일 게시판 수정
-    @PostMapping("/board/update/{boardId}/{mod_compl}") //mod_compl, 수정을 완료했는지
-    public ResponseEntity<Response<BoardResponse>> boardModify(@PathVariable("boardId") Long boardId,
-                                                               @Valid BoardWriteRequest request,
-                                                               @RequestParam("file") MultipartFile file,
-                                                               @PathVariable("mod_compl") boolean mod_compl) throws Exception {
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.reWrite(boardId,request, file ,mod_compl)));
-    }
 
     //다중 파일 게시판 수정
-    @PostMapping("/multiboard/update/{boardId}") //mod_compl, 수정을 완료했는지
+    @PostMapping("/multiboard/update/{boardId}/{memberId}/{teamId}/{workId}") //mod_compl, 수정을 완료했는지
     public ResponseEntity<Response<BoardResponse>> multiboardModify(@PathVariable("boardId") Long boardId,
+                                                                    @PathVariable("memberId") Long memberId,
+                                                                    @PathVariable("teamId") Long teamId,
+                                                                    @PathVariable("workId") Long workId,
                                                                @Valid BoardWriteRequest request,
                                                                @RequestParam("files") MultipartFile[] files) throws Exception {
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.multiReWrite(boardId,request, files )));
+        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.multiReWrite(boardId,workId,request, files )));
     }
 
 

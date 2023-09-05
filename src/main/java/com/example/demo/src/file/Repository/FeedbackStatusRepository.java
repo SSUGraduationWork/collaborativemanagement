@@ -22,7 +22,7 @@ public interface FeedbackStatusRepository extends JpaRepository<FeedbackStatuses
 
     List<FeedbackStatuses>  findByTeams(Teams teams);
 
-    List<FeedbackStatuses> findByUsersAndTeams(Members member, Teams team);
-
+    List<FeedbackStatuses> findByUsersIdAndTeamsId(Long memberId, Long teamId);
+    FeedbackStatuses findByBoardsIdAndUsersId(Long boardId, Long memberId);
     List<FeedbackStatuses> findByUsers(Members member);
 }

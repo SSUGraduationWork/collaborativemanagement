@@ -2,10 +2,7 @@ package com.example.demo.src.file.domain;
 
 import com.example.demo.src.file.WorkTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -16,7 +13,8 @@ import static jakarta.persistence.CascadeType.ALL;
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name ="Works")
 @EqualsAndHashCode(callSuper = false)
 public class Works extends WorkTimeEntity {
