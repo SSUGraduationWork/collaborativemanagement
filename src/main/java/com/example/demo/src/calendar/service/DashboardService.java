@@ -262,6 +262,12 @@ public class DashboardService {
     }
 
     @Transactional
+    public List<Projects2> watchProjectsBySemester(Long professor_id, String semester) {
+        List<Projects2> projects2List = projects2Repository.findByProfessorIdAndSemester(professor_id, semester);
+
+        return projects2List;
+    }
+    @Transactional
     public Teams2 createTeams(TeamsForm dto) {
         Teams2 teams2 = teams2Repository.save(dto.toEntity(dto));
         return teams2;

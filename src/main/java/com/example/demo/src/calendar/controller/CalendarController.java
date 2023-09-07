@@ -263,6 +263,19 @@ public class CalendarController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    //semester에 따라 대시보드에 보이는 프로젝트 다름
+    @GetMapping("/dashboard/projects/{professorId}/{semester}")
+    public ResponseEntity<ResponseData> watchProjectsBySemester(@PathVariable Long professorId, @PathVariable String semester) {
+        List<Projects2> projects2List = dashboardService.watchProjectsBySemester(professorId, semester);
+
+        if (projects2List.isEmpty()) {
+            return null;
+        }
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2List);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
     //2-3. team 생성 => 학생. Dashboard에서 생성할 것
     @PostMapping("/dashboard/teams/{studentId}")
     public ResponseEntity<ResponseData> createTeams(@RequestBody TeamsForm form, @PathVariable Long studentId) throws AlreadyExistException {
