@@ -1,5 +1,6 @@
 package com.example.demo.src.calendar.repository;
 
+import com.example.demo.src.calendar.entity.Minutes2;
 import com.example.demo.src.calendar.entity.Projects2;
 import org.springframework.data.repository.CrudRepository;
 
@@ -11,7 +12,7 @@ public interface Projects2Repository extends CrudRepository<Projects2, Long> {
     ArrayList<Projects2> findByProfessorId(Long professorId);
 
     Projects2 findByProjectName(String projectName);
-
+    ArrayList<Projects2> findByProfessorIdAndSemester(Long professrId, String semester);
     Projects2 findByProfessorIdAndId(Long professorId, Long id);
 
 //    @Query(SELECT * from (Members2 M inner join co_work.Projects2 P on M.id = P.professor_id)

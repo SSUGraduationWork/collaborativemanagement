@@ -185,8 +185,22 @@ public class DashboardService {
     }
     @Transactional
     public Minutes2 watchDate(String date) {
+
         Minutes2 minutes2 = minutes2Repository.findByDate(date);
         return minutes2;
+    }
+
+    @Transactional
+    public Minutes2 findMinute(Long teamId, String date) {
+        Minutes2 target = null;
+        List<Minutes2> minutes2List = minutes2Repository.findByTeamId(teamId);
+
+        for (Minutes2 minutes2 : minutes2List) {
+            if (minutes2.getDate().equals(date)) {
+                target = minutes2;
+            }
+        }
+        return target;
     }
     @Transactional
     public MinutesForm editMinutes(String date, MinutesForm dto) {
@@ -247,6 +261,12 @@ public class DashboardService {
         return projects2List;
     }
 
+    @Transactional
+    public List<Projects2> watchProjectsBySemester(Long professor_id, String semester) {
+        List<Projects2> projects2List = projects2Repository.findByProfessorIdAndSemester(professor_id, semester);
+
+        return projects2List;
+    }
     @Transactional
     public Teams2 createTeams(TeamsForm dto) {
         Teams2 teams2 = teams2Repository.save(dto.toEntity(dto));
@@ -314,6 +334,13 @@ public class DashboardService {
             check = true;
         }
         return check;
+    }
+    @Transactional
+    public String findProjectName(Long projectId) {
+        Projects2 projects2 = projects2Repository.findById(projectId).orElse(null);
+        String projectName = projects2.getProjectName();
+
+        return projectName;
     }
 
 //    @Transactional

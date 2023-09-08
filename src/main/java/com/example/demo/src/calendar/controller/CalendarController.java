@@ -3,6 +3,7 @@ package com.example.demo.src.calendar.controller;
 import com.example.demo.src.calendar.Exception.*;
 import com.example.demo.src.calendar.dto.MinutesForm;
 import com.example.demo.src.calendar.dto.ProjectsForm;
+import com.example.demo.src.calendar.dto.ResultForm;
 import com.example.demo.src.calendar.dto.TeamsForm;
 import com.example.demo.src.calendar.entity.Minutes2;
 import com.example.demo.src.calendar.entity.Projects2;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -120,13 +122,12 @@ public class CalendarController {
     //조회할 것이 없을 경우 null 출력
     @GetMapping("/calendars/minutes/{teamId}/{date}/{userId}")
     public ResponseEntity<ResponseData> getMinutes(@PathVariable Long teamId, @PathVariable String date, @PathVariable Long userId) {
-        //userId가 해당팀의 멤버인지 확인
 
-        //세부 조회
-        Minutes2 minutes2 = dashboardService.watchDate(date);
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes2);
+        //해당 teamId의 회의록 모두 찾기
+        Minutes2 minute= dashboardService.findMinute(teamId, date);
+        log.info("get minutes2: ", minute);
 
-        log.info("get minutes2: ", minutes2);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minute);
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -257,13 +258,27 @@ public class CalendarController {
         if (projects2List.isEmpty()) {
             return null;
         }
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2List);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    //semester에 따라 대시보드에 보이는 프로젝트 다름
+    @GetMapping("/dashboard/projects/{professorId}/{semester}")
+    public ResponseEntity<ResponseData> watchProjectsBySemester(@PathVariable Long professorId, @PathVariable String semester) {
+        List<Projects2> projects2List = dashboardService.watchProjectsBySemester(professorId, semester);
+
+        if (projects2List.isEmpty()) {
+            return null;
+        }
+
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     //2-3. team 생성 => 학생. Dashboard에서 생성할 것
-    @PostMapping("/dashboard/teams")
-    public ResponseEntity<ResponseData> createTeams(@RequestBody TeamsForm form, @RequestParam Long userId) throws AlreadyExistException {
+    @PostMapping("/dashboard/teams/{studentId}")
+    public ResponseEntity<ResponseData> createTeams(@RequestBody TeamsForm form, @PathVariable Long studentId) throws AlreadyExistException {
         //1. Team form의 not null이 모두 들어왔는지 확인
         boolean formcheck = dashboardService.checkTeamsForm(form);
         if (formcheck == false) {
@@ -271,11 +286,11 @@ public class CalendarController {
         }
 
         //2. Members2 테이블에 존재하는지 + role이 학생인지 확인
-        boolean membercheck = dashboardService.checkMember(userId);
+        boolean membercheck = dashboardService.checkMember(studentId);
         if (membercheck == false) {
             throw new MemberNotFoundException("Member Not Found");
         }
-        String professorcheck = dashboardService.checkRole(userId);
+        String professorcheck = dashboardService.checkRole(studentId);
         if (!professorcheck.equals("student")) {
             throw new MemberNotFoundException("Not Student");
         }
@@ -296,7 +311,7 @@ public class CalendarController {
         //1. 팀생성
         Teams2 teams2 = dashboardService.createTeams(form);
         //2. 팀멤버 테이블 추가
-        dashboardService.createTeamsMembers(teams2.getTeamId(), userId);
+        dashboardService.createTeamsMembers(teams2.getTeamId(), studentId);
 
         //3. 프로젝트와 팀 count 1씩
         Teams2 target = dashboardService.countNums(teams2.getTeamId(), teams2.getProjectId());
@@ -347,29 +362,33 @@ public class CalendarController {
     }
 
     //2-4. team 조회: project 별로 모든 팀 조회=> 교수, Dashboard에서 프로젝트 클릭시
-    @GetMapping("/dashboard/teamsByPro/{professorId}/{projectId}")
-    public ResponseEntity<ResponseData> watchTeamsByPro(@PathVariable Long professorId, @PathVariable Long projectId) {
-        //1. 교수인지 권한 확인
-        boolean membercheck = dashboardService.checkMember(professorId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(professorId);
-        if (!professorcheck.equals("professor")) {
-            throw new MemberNotFoundException("Not Professor");
-        }
-        //2. 해당 프로젝트 생성자가 해당 professorId인지 확인
-        boolean match = dashboardService.matchProfessorAndProject(professorId, projectId);
-        if (match == false) {
-            throw new ProjectNotFoundException("Matching Project Not Found");
-        }
+    @GetMapping("/dashboard/teamsByPro/{projectId}")
+    public ResponseEntity<ResponseData> watchTeamsByPro(@PathVariable Long projectId) {
+//        //1. 교수인지 권한 확인
+//        boolean membercheck = dashboardService.checkMember(professorId);
+//        if (membercheck == false) {
+//            throw new MemberNotFoundException("Member Not Found");
+//        }
+//        String professorcheck = dashboardService.checkRole(professorId);
+//        if (!professorcheck.equals("professor")) {
+//            throw new MemberNotFoundException("Not Professor");
+//        }
+//        //2. 해당 프로젝트 생성자가 해당 professorId인지 확인
+//        boolean match = dashboardService.matchProfessorAndProject(professorId, projectId);
+//        if (match == false) {
+//            throw new ProjectNotFoundException("Matching Project Not Found");
+//        }
 
         //3. 처리
         List<Teams2> teams2List = dashboardService.watchTeamsByPro(projectId);
         if (teams2List.isEmpty()) {
             return null;
         }
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teams2List);
+        String projectName = dashboardService.findProjectName(projectId);
+
+        ResultForm resultForm = new ResultForm(teams2List, projectName);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
