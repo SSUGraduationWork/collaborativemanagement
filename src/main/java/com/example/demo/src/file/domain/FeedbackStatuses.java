@@ -33,7 +33,7 @@ public class FeedbackStatuses {
     private Teams teams;
 
     @Column(name = "feedback_yn")
-    private boolean feedbackYn;
+    private Integer feedbackYn;
 
 
     //연관관계 편의 메소드
@@ -55,18 +55,19 @@ public class FeedbackStatuses {
     }
     //게시판에 대한 피드백 승인 메소드
     public void feedbackAgree(){
-        this.feedbackYn = true;
+        this.feedbackYn = 1;
     }
 
     //게시판에 대한 피드백 거절 메소드
     public void feedbackDeny(){
-        this.feedbackYn = false;
+        this.feedbackYn = 2;
     }
 
     @Builder
     public FeedbackStatuses(Members members ){
         this.boards = boards;
-        this.feedbackYn=false;
+        this.feedbackYn=0;
         this.users=members;
     }
+
 }

@@ -24,7 +24,7 @@ private String workName;
 
 private String writerName;
 
-private boolean feedbackYn;
+private Integer feedbackYn;
 
 private String pictureUrl;
 
@@ -39,7 +39,7 @@ private Long userId;
     @Builder
     public BoardResponse(Long boardId, String title, Long viewCount,
                          LocalDateTime createdTime, String workName,String writerName,
-                         boolean feedbackYn,Long userId,String pictureUrl){
+                         Integer feedbackYn,Long userId,String pictureUrl){
         this.boardId = boardId;
         this.title = title;
         this.viewCount=viewCount;

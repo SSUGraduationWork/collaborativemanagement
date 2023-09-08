@@ -2,15 +2,18 @@ package com.example.demo.src.file.Service;
 
 
 
+import com.example.demo.src.account.entity.Member;
 import com.example.demo.src.file.Repository.*;
 import com.example.demo.src.file.domain.*;
 import com.example.demo.src.file.dto.request.FeedbackRequest;
 import com.example.demo.src.file.dto.response.BoardFeedbackResponse;
 import com.example.demo.src.file.dto.response.FeedbackResponse;
+import com.example.demo.src.file.dto.response.OnlyFeedbackYnResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,45 +30,94 @@ public class FeedbackService {
     private MembersRepository membersRepository;
     private FeedbackStatusRepository feedbackStatusRepository;
 
+    private WorkRepository workRepository;
+
+    private TeamMemberRepository teamMemberRepository;
     private final AlarmRepository alarmRepository;
-    public FeedbackResponse save(Long boardId, Long memberId, FeedbackRequest requset, boolean isApproved) {
+
+    public FeedbackResponse save(Long boardId, Long memberId, FeedbackRequest requset, Integer isApproved) {
         //피드백 등록
         Boards boards =boardRepository.findById(boardId).get();
         Members writers = membersRepository.findById(memberId).get();
+        //workRepository.findById(teamId)
         Feedbacks feedbacks = toEntity(requset);
         feedbacks.confirmBoard(boards);
         feedbacks.confirmMember(writers);
         feedbackRepository.save(feedbacks);
 
-        //피드백 작성자가 동의 하면 feedbackStauses의 feedback_yn=true로 변경
-        OneTeaamMemberAgreeCheck(boards, writers,isApproved);
+        OneTeaamMemberAgreeCheck(isApproved, boards, writers);
+
+
+
+
+        //-----------------------------
+
+
 
         // 팀원 모두 동의하면 boards의 feedback_yn=true로 변경
-        AllTeamMemberAgreeCheck(boards);
+        AllTeamMemberAgreeCheck(boards,writers);
 
         return FeedbackResponse.from(feedbacks, boards);
     }
 
-    public  void OneTeaamMemberAgreeCheck(Boards boards, Members writers, boolean isApproved){
-        //boards, writers로 feedbackStatus찾기
-        FeedbackStatuses feedbackStatus =feedbackStatusRepository.findByBoardsAndUsers(boards, writers);
-        if (isApproved) {
-            // 승인한 경우 feedbackYn=true로 바꾸기
-            feedbackStatus.feedbackAgree();
-        } else {
-            // 거부한 경우 feedbackYn=false로 바꾸기
-            feedbackStatus.feedbackDeny();
+    public  void OneTeaamMemberAgreeCheck( Integer isApproved, Boards boards, Members writers){
+        //-----------------------------
+        FeedbackStatuses feedbackStatuses=feedbackStatusRepository.findByBoardsIdAndUsersId(boards.getId(), writers.getId());
+        //한번도 피드백을 하지 않았던 경우에
+        if(feedbackStatuses.getFeedbackYn()==0){
+            //피드백을 등록 하기만 하면
+            //work 상태를 피드백진행중=3으로 바꿈
 
-            //게시판 작성자에게 알람이 가도록 함
-            FeedbackStatusAndAlarm(boards, writers);
+            //work에게 기여도 +1증가
+            //한번 피드백을 했으면 다시 못바꿈)
+
+            Works works=workRepository.findById(boards.getWorks().getId()).get();
+             works.setStatus(3);
+            workRepository.save(works);
+
+            List<Workers> workers=works.getWorkersList();
+            for(Workers w:workers){
+                System.out.println("workers "+w.getUsers().getId());
+                System.out.println("writeYn "+w.getWriteYn());
+            }
+
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            // works.getEndDate()가 현재 시간보다 이후인지 확인합니다.
+            //마감기한 전에 피드백 했을 때만 점수 받을 수 있음
+            if (works.getEndDate().isAfter(currentTime)) {
+                TeamMembers teamMembers=teamMemberRepository.findByTeamsIdAndUsersId(boards.getTeams().getId(),writers.getId());
+
+                teamMembers.addContribution(1);
+                teamMemberRepository.save(teamMembers);
+            }
+
+
+
+
+            //피드백 작성자가 동의 하면 feedbackStauses의 feedback_yn=true로 변경
+            //중복 코드 수정, feedbackStatus조회
+            if (isApproved==1) {
+                // 승인한 경우 feedbackYn=true로 바꾸기
+                feedbackStatuses.feedbackAgree();
+            } else if((isApproved==2)){
+                // 거부한 경우 feedbackYn=false로 바꾸기
+                feedbackStatuses.feedbackDeny();
+
+                //피드백에서 수정 요청 시  수정 요청한 본인 제외 모든 팀의 모든 팀원들에게 알람이 감
+                FeedbackStatusAndAlarm(boards, writers);
+
+            }
+
 
         }
+
     }
 
     //멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
     public void FeedbackStatusAndAlarm(Boards boards, Members writers ){ //wrtier은 feedback작성자
 
-            //알림 기능, 글 등록 시 모든 팀의 모든 팀원들에게 알람이 감
+            //피드백에서 수정 요청 시 모든 팀의 모든 팀원들에게 알람이 감
             String userName = writers.getUserName(); //피드백 작성자 이름
             Integer studentNumber = writers.getStudentNumber(); // 피드백 작성자 학번
             String workName= boards.getWorks().getWorkName();//작업이름
@@ -99,7 +151,7 @@ public class FeedbackService {
 
 
     //???? 완료 되었을 때도 알람이 가게 할지??
-    public  void AllTeamMemberAgreeCheck(Boards boards){
+    public  void AllTeamMemberAgreeCheck(Boards boards,Members writers){
 
         // Board에 해당하는 모든 FeedbackStatuses 조회
         List<FeedbackStatuses> feedbackStatusesList = feedbackStatusRepository.findByBoards(boards);
@@ -110,21 +162,68 @@ public class FeedbackService {
 
             // 모든 FeedbackStatuses의 feedback_yn이 true인지 확인
             for (FeedbackStatuses feedbackStatuses : feedbackStatusesList) {
-                if (!feedbackStatuses.isFeedbackYn()) { //한명이라도 feedback을 안했으면
+                if (feedbackStatuses.getFeedbackYn()==0||feedbackStatuses.getFeedbackYn()==2) { //한명이라도 feedback을 안했으면
                     hasFeedbackYnTrue = false;
                     break;
                 }
             }
 
             // 모든 FeedbackStatuses의 feedback_yn이 true라면 board의 feedback_yn도 true로 변경
-            if (hasFeedbackYnTrue) {
+            if (hasFeedbackYnTrue&& boards.isFeedbackYn()==false) {
+
+                Works works=workRepository.findById(boards.getWorks().getId()).get();
+                LocalDateTime currentTime = LocalDateTime.now();
+                // works.getEndDate()가 현재 시간보다 이후인지 확인합니다.
+                //마감기한 전에 피드백 했을 때만 점수 받을 수 있음
+                if (works.getEndDate().isAfter(currentTime)) {
+                    TeamMembers teamMembers=teamMemberRepository.findByTeamsIdAndUsersId(boards.getTeams().getId(),boards.getUsers().getId());
+
+                    float importance = (float) works.getImportance();
+                    float workerNumber = (float) works.getWorkerNumber();
+                    teamMembers.addContribution(importance/workerNumber);
+                    teamMemberRepository.save(teamMembers);
+                }
                 boards.setFeedbackYn(true);
                 boardRepository.save(boards);
                 //팀원 모두에게 피드백 완료 알람 전송
                 allFeedbackCompleteAlarm(boards);
+
+                //workId에 해당하는 모든 게시판 피드백이 완료 되었을시 work의 status를 4로 변경
+                AllWorkComplCheck( boards,writers);
             }
         }
     }
+
+
+    //???? 완료 되었을 때도 알람이 가게 할지??
+    public  void AllWorkComplCheck(Boards boards,Members writers){
+        //피드백을 한 board의 work에 해당하는 모든 boardList들을 불러옴
+        //work의 상태를 (4=완료)로 바꾸기 위해 work에 해당하는 boardList들의 feedbackYn이 모두 true인지 확인해야함
+       List<Boards> boardList= boardRepository.findByWorksId(boards.getWorks().getId());
+
+            boolean hasFeedbackYnTrue = true;
+
+            // 모든 FeedbackStatuses의 feedback_yn이 true인지 확인
+            for (Boards board : boardList) {
+                if (board.isFeedbackYn()==false) { //한명이라도 feedback을 안했으면
+                    hasFeedbackYnTrue = false;
+                    break;
+                }
+
+            // 모든 BoardList들의 feedback_yn이 true라면 work의 status를 4로 변경
+            //이미 status가 4하면 할 필요 없음
+            if (hasFeedbackYnTrue&& boards.getWorks().getStatus()!=4) {
+
+                Works works=workRepository.findById(boards.getWorks().getId()).get();
+                works.setStatus(4);
+                workRepository.save(works);
+
+                //모든 work가 완료되었을때 알람을 보내도록 할지?
+                //정하기
+            }
+        }
+    }
+
 
     public void allFeedbackCompleteAlarm(Boards boards){ //wrtier은 feedback작성자
 
@@ -158,28 +257,27 @@ public class FeedbackService {
     }
 
 
-    public void reFeedback(Long boardId, Long memberId, boolean isApproved) { //재수락할지, 거절할지
+    public void reFeedback(Long boardId, Long memberId, Integer isApproved) { //재수락할지, 거절할지
         Boards boards =boardRepository.findById(boardId).get();
         Members writers = membersRepository.findById(memberId).get();
 
         //boards, writers로 feedbackStatus찾기
         FeedbackStatuses feedbackStatus =feedbackStatusRepository.findByBoardsAndUsers(boards, writers);
-        if (isApproved) {
+        if (isApproved==1) {
             // 승인한 경우 feedbackYn=true로 바꾸기
             feedbackStatus.feedbackAgree();
 
             //게시판 작성자에게 수락 알람이 가도록 함
             reFeedbackAlarmAgree(boards, writers);
-        } else {
+        } else if((isApproved==2)){
             // 거부한 경우 feedbackYn=false로 바꾸기
             feedbackStatus.feedbackDeny();
 
             //게시판 작성자에게 거절 알람이 가도록 함
             reFeedbackAlarmDeny(boards, writers);
-
         }
         // 팀원 모두 동의하면 boards의 feedback_yn=true로 변경
-        AllTeamMemberAgreeCheck(boards);
+        AllTeamMemberAgreeCheck(boards,writers);
     }
 
 
@@ -254,7 +352,7 @@ public class FeedbackService {
                             .userName(feedbacks.getWriters().getUserName())
                             .pictureUrl(feedbacks.getWriters().getPictureUrl())
                             .createdAt(feedbacks.getCreatedAt())
-                            .modReq(feedbackStatus.isFeedbackYn())
+                            .modReq(feedbackStatus.getFeedbackYn())
                             .build();
                     boardFeedbackResponses.add(boardFeedbackResponse);
                 }
@@ -262,5 +360,15 @@ public class FeedbackService {
         }
 
         return boardFeedbackResponses;
+    }
+
+    public int getFeedbackYn(Long boardId, Long memberId) {
+        FeedbackStatuses feedbackStatuses=feedbackStatusRepository.findByBoardsIdAndUsersId(boardId,memberId);
+        return feedbackStatuses.getFeedbackYn();
+    }
+
+    public Members getUsers(Long memberId) {
+        Members members =membersRepository.findById(memberId).get();
+        return members;
     }
 }

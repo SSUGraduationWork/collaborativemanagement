@@ -35,17 +35,20 @@ public class Works extends WorkTimeEntity {
     @Column(name = "importance")
     private Integer importance;
 
-    @Column(name = "status", columnDefinition = "int default 1")
+    @Column(name = "status")
     private Integer status;
 
     @Column(name = "worker_number")
     private Integer workerNumber;
 
-    @Column(name = "delete", nullable = false, columnDefinition = "tinyint(1) default 0")
-    private boolean delete;
+    @Column(name = "del_yn")
+    private boolean delYn;
 
     @OneToMany(mappedBy = "works", cascade = ALL, orphanRemoval = true)
     private List<Boards> boardsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "works", cascade = ALL, orphanRemoval = true)
+    private List<Workers> workersList = new ArrayList<>();
 
     //피드백 추가,연관관계 편의 메소드
     public void addBoards(Boards boards){

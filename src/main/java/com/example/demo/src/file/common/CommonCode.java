@@ -12,7 +12,7 @@ public enum CommonCode implements ResponseCode {
     BAD_REQUEST(201, "잘못된 요청입니다."),
     ILLEGAL_REQUEST(202, "잘못된 데이터가 포함된 요청입니다."),
     VALIDATION_FAILURE(203, "입력값 검증이 실패하였습니다."),
-    INTERNAL_SERVER_ERROR(204, "서버 내부에 문제가 생겼습니다."),
+    INTERNAL_SERVER_ERROR(404, "서버 내부에 문제가 생겼습니다."),
     ;
 
     private final int code;

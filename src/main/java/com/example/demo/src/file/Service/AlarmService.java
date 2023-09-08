@@ -43,7 +43,7 @@ public class AlarmService {
 
                     FeedbackStatuses feedbackStatuses=feedbackStatusRepository.findByBoardsIdAndUsersId(alarm.getBoards().getId(),memberId);
                     AlarmDetailResponse response = AlarmDetailResponse.from(alarm);
-                    response.setFeedbackYn(feedbackStatuses.isFeedbackYn());
+                    response.setFeedbackYn(feedbackStatuses.getFeedbackYn());
                     return response;
                 })
                 .collect(Collectors.toList());

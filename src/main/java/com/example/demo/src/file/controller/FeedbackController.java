@@ -2,7 +2,9 @@ package com.example.demo.src.file.controller;
 
 import com.example.demo.src.file.Service.FeedbackService;
 import com.example.demo.src.file.common.CommonCode;
+import com.example.demo.src.file.common.FeedbackYnResponse;
 import com.example.demo.src.file.common.Response;
+import com.example.demo.src.file.domain.Members;
 import com.example.demo.src.file.dto.request.FeedbackRequest;
 import com.example.demo.src.file.dto.response.BoardFeedbackResponse;
 import com.example.demo.src.file.dto.response.FeedbackResponse;
@@ -28,7 +30,7 @@ public class FeedbackController {
     public ResponseEntity<Response<FeedbackResponse>>  commentSave(@PathVariable("boardId") Long boardId,
                                                                    @PathVariable("writerId") Long writerId,
                                                                    FeedbackRequest request,
-                                                                   @PathVariable("isApproved") boolean isApproved){
+                                                                   @PathVariable("isApproved") Integer isApproved){
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.save(boardId,writerId,request,isApproved)));
     }
 
@@ -37,16 +39,31 @@ public class FeedbackController {
     @ResponseStatus(HttpStatus.CREATED)
     public void  reApproved(@PathVariable("boardId") Long boardId,
                             @PathVariable("writerId") Long writerId,
-                            @PathVariable("isApproved") boolean isApproved){
+                            @PathVariable("isApproved") Integer isApproved){
         feedbackService.reFeedback(boardId,writerId,isApproved);
     }
 
-
+/*
     //피드백 보기
     @GetMapping("/comment/{boardId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Response<List<BoardFeedbackResponse>>>  commentView(@PathVariable("boardId") Long boardId){
        return  ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.feedbackView(boardId)));
+
+    }
+
+
+ */
+    //피드백 보기
+    //front에서 피드백을 쓰자마자 바로 보여주기 위해서 addComment라는 변수에 담아서 화면에 보여줬음.
+    //feedback의 거절 승인은 한번하여 번복이 없음. feedback 승인,여부가 필요함
+    @GetMapping("/comment/{boardId}/{memberId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<FeedbackYnResponse<List<BoardFeedbackResponse>>>  commentFeedbackView(@PathVariable("boardId") Long boardId,
+                                                                                                @PathVariable("memberId") Long memberId){
+
+        Members members=feedbackService.getUsers(memberId);
+        return  ResponseEntity.ok(FeedbackYnResponse.of(CommonCode.GOOD_REQUEST, feedbackService.feedbackView(boardId),feedbackService.getFeedbackYn(boardId,memberId),members.getPictureUrl(),members.getUserName(),members.getStudentNumber()));
     }
 
 

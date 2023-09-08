@@ -5,7 +5,6 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="Team_members")
 @Entity
 @Getter
@@ -26,7 +25,12 @@ public class TeamMembers {
     private Members users;
 
     @Column(name = "contribution")
-    private Long contribution;
+    private float contribution;
+
+    // 생성자를 추가하여 contribution을 0으로 초기화
+    public TeamMembers() {
+        this.contribution = 0;
+    }
 
     //연관관계 편의 메소드
     public void confirmTeam(Teams teams){
@@ -40,5 +44,9 @@ public class TeamMembers {
         users.addMembers(this);
     }
 
+    public TeamMembers addContribution(float num){
+        this.contribution+=num;
+        return this;
+    }
 
 }

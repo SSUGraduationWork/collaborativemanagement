@@ -45,6 +45,9 @@ public class Teams {
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<Works> workList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
+    private List<Workers> workerList = new ArrayList<>();
+
     //피드백 추가,연관관계 편의 메소드
     public void addBoards(Boards boards){
         //comment의 Post 설정은 comment에서 함

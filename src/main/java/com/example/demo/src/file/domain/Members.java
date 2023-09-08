@@ -72,6 +72,10 @@ public class Members  {
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<Alarms> alarmsList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
+    private List<Workers> workersList = new ArrayList<>();
+
+
     public void addFeedbackStatuses(FeedbackStatuses feedbackStatuses){
         //comment의 Post 설정은 comment에서 함
         feedbackStatusList.add(feedbackStatuses);

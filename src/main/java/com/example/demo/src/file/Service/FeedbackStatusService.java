@@ -35,18 +35,18 @@ public class FeedbackStatusService {
         Integer finishedCnt = 0; // 피드백을 한 경우 카운트
         Integer todoCnt = 0; // 피드백을 안 한 경우 카운트
 
-        for (Boards boards : boardsList) {
-            FeedbackStatuses feedbackStatus = feedbackStatusRepository.findByBoardsAndUsers(boards, member);
+        for (Boards board : boardsList) {
+            FeedbackStatuses feedbackStatus = feedbackStatusRepository.findByBoardsAndUsers(board, member);
 
-            BoardResponse boardResponse = BoardResponse.from(boards);
+            BoardResponse boardResponse = BoardResponse.from(board);
 
-            if (boards.getUsers().getId().equals(memberId)) {
-                boardResponse.setFeedbackYn(true);
+            if (board.getUsers().getId().equals(memberId)) {
+                boardResponse.setFeedbackYn(1);
             } else {
-                boardResponse.setFeedbackYn(feedbackStatus.isFeedbackYn());
-                if (feedbackStatus.isFeedbackYn()) {
+                boardResponse.setFeedbackYn(feedbackStatus.getFeedbackYn());
+                if (feedbackStatus.getFeedbackYn()==1) {
                     finishedCnt++;
-                } else {
+                } else if(feedbackStatus.getFeedbackYn()==2){
                     todoCnt++;
                 }
             }

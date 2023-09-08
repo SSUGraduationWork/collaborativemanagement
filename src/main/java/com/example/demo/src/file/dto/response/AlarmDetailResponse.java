@@ -26,7 +26,7 @@ public class AlarmDetailResponse {
 
     private Long userId;
 
-    private boolean feedbackYn;//수정 요청 여부 0이면 수정 거부한거임-> 추후에 변경예정
+    private Integer feedbackYn;//수정 요청 여부 0이면 수정 거부한거임-> 추후에 변경예정
     //0과1로 하면 생기는 문제점이 피드백을 하지 않은 사람도 거부한걸로 됨
     //string으로 바꾸어서 안한 상태, 거부, 승인 이렇게 3가지 경우로 바꿔야 함
 
@@ -35,7 +35,7 @@ public class AlarmDetailResponse {
     private Long boardId;
 
     @Builder
-    public AlarmDetailResponse(Long alarmId, Long userId,Long writerId,Long boardId, boolean seen,boolean feedbackYn,String content, String redirectUrl,LocalDateTime createdTime,String pictureUrl, String alarmKind){
+    public AlarmDetailResponse(Long alarmId, Long userId,Long writerId,Long boardId, boolean seen,Integer feedbackYn,String content, String redirectUrl,LocalDateTime createdTime,String pictureUrl, String alarmKind){
         this.alarmId = alarmId;
         this.userId=userId;
         this.writerId=writerId;

@@ -21,11 +21,12 @@ public class WorkController {
     private final WorkService workService;
 
     //게시글 리스트+페이징 추후 필요+정렬 필요
-    @GetMapping("/work/list/{teamId}")
+    @GetMapping("/work/list/{memberId}/{teamId}")
     public ResponseEntity<Response<List<WorkResponse>>> boardList(
+            @PathVariable("memberId") Long memberId,
             @PathVariable("teamId") Long teamId){
 
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, workService.workList(teamId)));
+        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, workService.workList(memberId,teamId)));
     }
 
 }

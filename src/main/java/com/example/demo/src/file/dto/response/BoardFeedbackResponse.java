@@ -22,7 +22,7 @@ public class BoardFeedbackResponse  {
 
     private String pictureUrl;
 
-    private boolean modReq;
+    private Integer modReq;
     public BoardFeedbackResponse() {
 
     }
@@ -33,7 +33,7 @@ public class BoardFeedbackResponse  {
 
     @Builder
     public BoardFeedbackResponse (Long feedbackId, String comment,LocalDateTime createdAt,
-                             Integer studentNumber,String userName,String pictureUrl, boolean modReq){
+                             Integer studentNumber,String userName,String pictureUrl, Integer modReq){
 
         this.feedbackId=feedbackId;
         this.comment=comment;
@@ -52,7 +52,7 @@ public class BoardFeedbackResponse  {
                 .studentNumber(feedbacks.getWriters().getStudentNumber())
                 .userName(feedbacks.getWriters().getUserName())
                 .pictureUrl(feedbacks.getWriters().getPictureUrl())
-                .modReq(feedbackStatuses.isFeedbackYn())
+                .modReq(feedbackStatuses.getFeedbackYn())
                 .build();
     }
 }

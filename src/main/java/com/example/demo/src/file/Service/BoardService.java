@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -27,6 +25,7 @@ public class BoardService {
     private FeedbackStatusRepository feedbackStatusRepository;
     private AlarmRepository alarmRepository;
     private FileRepository fileRepository;
+    private WorkerRepository workerRepository;
 
     public void  increaseCount(Long boardId){
         Boards boards = boardRepository.findById(boardId).get();
@@ -36,40 +35,58 @@ public class BoardService {
 
     //글 작성
     public BoardResponse multiWrite(BoardWriteRequest request, Long memberId, Long teamId, Long workId, MultipartFile[] files) throws Exception {
-        // 게시판 등록
+        //memberId와 workId로 worker조회하기. 글을 쓰는 사람이 work를 담당한 worker인지 확인하기 위함
+        Optional<Workers> workersOptional=workerRepository.findByUsersIdAndWorksId(memberId,workId);
+        Workers workers = workersOptional.get();
         String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
-        Members members = membersRepository.findById(memberId).get();
-        Teams teams = teamRepository.findById(teamId).get();
-        Works works = workRepository.findById(workId).get();
+        //work의 담당자만 게시판을 작성할 수 있음
+        //각각의 담당자마다 게시판을 한번만 작성할 수 있음
+        if (workersOptional.isPresent()&&workers.getWriteYn()==false) {
+            //woker가 게시판을 작성했음을 등록
 
-        Boards boards = toEntity(request);
-        boards.confirmMember(members);
-        boards.confirmTeam(teams);
-        boards.confirmWork(works);
+            workers.setWriteYn(true);
+            workerRepository.save(workers);
+            // 게시판 등록
 
-        boardRepository.save(boards);
-        // Save all uploaded files
-        if (files != null) {
-            for (MultipartFile file : files) {
-                UUID uuid = UUID.randomUUID();
-                String fileName = uuid + "_" + file.getOriginalFilename();
-                File saveFile = new File(projectPath, fileName);
-                file.transferTo(saveFile);
+            Members members = membersRepository.findById(memberId).get();
+            Teams teams = teamRepository.findById(teamId).get();
+            Works works = workRepository.findById(workId).get();
+
+            Boards boards = toEntity(request);
+            boards.confirmMember(members);
+            boards.confirmTeam(teams);
+            boards.confirmWork(works);
+
+            boardRepository.save(boards);
+            // Save all uploaded files
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    UUID uuid = UUID.randomUUID();
+                    String fileName = uuid + "_" + file.getOriginalFilename();
+                    File saveFile = new File(projectPath, fileName);
+                    file.transferTo(saveFile);
 
 
-                // 빌더를 사용하여 파일 객체 생성
-                Files file1 = Files.builder()
-                        .filename(fileName)
-                        .filepath("/files/" + fileName)
-                        .build();
-                file1.confirmBoard(boards);
-                fileRepository.save(file1);
+                    // 빌더를 사용하여 파일 객체 생성
+                    Files file1 = Files.builder()
+                            .filename(fileName)
+                            .filepath("/files/" + fileName)
+                            .build();
+                    file1.confirmBoard(boards);
+                    fileRepository.save(file1);
 
+                }
             }
+            // 멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
+            FeedbackStatusAndAlarm(boards, members, works,teams);
+            return BoardResponse.from(boards);
+        } else {
+            throw new NoSuchElementException("Workers not found for userId: " + memberId + " and workId: " + workId);
         }
-        // 멤버수에 맞는 feedbackstatus 테이블 등록 및 글 생성 알람 메시지 저장
-        FeedbackStatusAndAlarm(boards, members, works,teams);
-        return BoardResponse.from(boards);
+
+
+
+
     }
 
 
@@ -85,7 +102,8 @@ public class BoardService {
             if(member.equals(writers)){
                 FeedbackStatuses feedbackStatuses = new FeedbackStatuses();
                 feedbackStatuses.confirmBoard(boards); // 연관관계 설정
-                feedbackStatuses.setFeedbackYn(true); // 예시로 피드백 상태를 false로 설정;
+                feedbackStatuses.setFeedbackYn(3); // 게시판을 작성한 본인은 3으로 예외처리, 피드백을 자기 스스로 할 필요가 없음. 해야할 남은 피드백의 개수에도 count되지 않음
+
                 feedbackStatuses.confirmMember(member);
                 feedbackStatuses.confirmTeam(teams);
                 feedbackStatusRepository.save(feedbackStatuses);
@@ -96,7 +114,7 @@ public class BoardService {
             // FeedbackStatuses 엔티티 생성 및 저장
             FeedbackStatuses feedbackStatuses = new FeedbackStatuses();
             feedbackStatuses.confirmBoard(boards); // 연관관계 설정
-            feedbackStatuses.setFeedbackYn(false); // 예시로 피드백 상태를 false로 설정
+            feedbackStatuses.setFeedbackYn(0); // 예시로 피드백 상태를 false로 설정
 
 
             feedbackStatuses.confirmMember(member);
@@ -155,7 +173,7 @@ public class BoardService {
             Boards board = boardsList.get(i);
             FeedbackStatuses feedbackStatus=feedbackStatusesList.get(i);
             BoardResponse boardResponse = BoardResponse.from(board);
-            boardResponse.setFeedbackYn(feedbackStatus.isFeedbackYn());
+            boardResponse.setFeedbackYn(feedbackStatus.getFeedbackYn());
             boardResponses.add(boardResponse);
         }
         return boardResponses;
