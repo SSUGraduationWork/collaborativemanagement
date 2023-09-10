@@ -405,7 +405,7 @@ public class CalendarController {
         }
         String projectName = dashboardService.findProjectName(projectId);
 
-        ResultForm resultForm = new ResultForm(teams2List, projectName);
+        ResultForm resultForm = new ResultForm(teams2List, projectName, null);
 
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
@@ -426,11 +426,36 @@ public class CalendarController {
         }
         //3. 처리
         List<Teams2> teams2List = dashboardService.watchTeamsByStu(id);
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teams2List);
+
+        //4. projectName과 semester도 같이 보내줌: teams2List에 projectId 존재. 해당 project의 정보(projectName, semester) 받아옴
+        List<Projects2> projects2List = dashboardService.findProjectInfo(teams2List);
+
+        ResultForm resultForm = new ResultForm(teams2List, null, projects2List);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    //2-5. team 수정
+    //2-5. semester에 따라 team 다르게 보이기
+    @GetMapping("/dashboard/teams/{studentId}/{semester}")
+    public ResponseEntity<ResponseData> watchTeamsBySemester(@PathVariable Long studentId, @PathVariable String semester) {
+        List<Teams2> teams2List = dashboardService.watchTeamsByStu(studentId);
+
+        if (teams2List.isEmpty()) {
+            return null;
+        }
+
+        List<Teams2> resultTeamList = dashboardService.findTeamBySemester(teams2List, semester);
+        log.info("semesterResultForm: ", resultTeamList);
+        List<Projects2> projects2List = dashboardService.findProjectInfo(resultTeamList);
+        log.info("semesterResultForm: ", projects2List);
+        ResultForm resultForm = new ResultForm(resultTeamList, null, projects2List);
+        log.info("semesterResultForm: ", resultForm);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    //2-6. team 수정
     @PatchMapping("/dashboard/teams")
     public ResponseEntity<ResponseData> updateTeams(@RequestBody TeamsForm form) {
         Teams2 teams = dashboardService.editTeams(form);
@@ -439,7 +464,7 @@ public class CalendarController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    //2-6. teams 삭제
+    //2-7. teams 삭제
     @DeleteMapping("/dashboard/teams/{teamId}")
     public ResponseEntity<ResponseData> deleteTeams(@PathVariable Long teamId) {
         dashboardService.deleteTeams(teamId);

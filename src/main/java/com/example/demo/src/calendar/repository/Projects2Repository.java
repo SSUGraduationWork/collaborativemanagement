@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.ArrayList;
 
 public interface Projects2Repository extends CrudRepository<Projects2, Long> {
+
     ArrayList<Projects2> findAll();
 
     ArrayList<Projects2> findByProfessorId(Long professorId);

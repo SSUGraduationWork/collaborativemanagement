@@ -1,5 +1,6 @@
 package com.example.demo.src.calendar.repository;
 
+import com.example.demo.src.calendar.entity.Projects2;
 import com.example.demo.src.calendar.entity.Teams2;
 import org.springframework.data.repository.CrudRepository;
 
@@ -14,4 +15,5 @@ public interface Teams2Repository extends CrudRepository<Teams2, Long> {
     Teams2 findByTeamName(String teamName);
 
     Teams2 findByTeamId(Long teamId);
+
 }

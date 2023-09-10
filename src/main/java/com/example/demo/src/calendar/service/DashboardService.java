@@ -334,7 +334,6 @@ public class DashboardService {
             TeamMembers2 teamMembers2 = teamMembers2List.get(i); //객체 전체 선택
             teamsId.add(teamMembers2.getTeamId());             //각 객체에서 teamId만 teamsId에 넣기
         }
-        log.info("teamsId:"+ teamsId);
 
         int count = teamsId.size();
 
@@ -343,7 +342,6 @@ public class DashboardService {
             teams2List.add(teams2);
         }
 
-        log.info("teams2List:"+ teams2List);
         return teams2List;
     }
 
@@ -362,6 +360,39 @@ public class DashboardService {
         String projectName = projects2.getProjectName();
 
         return projectName;
+    }
+
+    @Transactional
+    public List<Projects2> findProjectInfo(List<Teams2> teams2List) {
+        List<Projects2> projects2List = new ArrayList<>();
+
+        for (Teams2 teams2: teams2List) {
+            Long projectId = teams2.getProjectId();
+            projects2List.add(projects2Repository.findById(projectId).orElse(null));
+        }
+
+        return projects2List;
+    }
+
+    @Transactional
+    public List<Teams2> findTeamBySemester(List<Teams2> teams2List, String semester) {
+        List<Teams2> resultTeamList = new ArrayList<>();
+        Long projectId = null;
+
+        for (Teams2 teams2:teams2List) {
+            projectId = teams2.getProjectId();
+            log.info("projectId: "+ teams2.toString());
+            log.info("project"+ teams2.getProjectId().toString());
+            Projects2 projects2 = projects2Repository.findById(projectId).orElse(null);
+            log.info("projects2: "+projects2.toString());
+            log.info("projects2.getSemester: "+ projects2.getSemester().toString()+ "semester: "+ semester.toString());
+            if (projects2.getSemester().equals(semester)) {
+                resultTeamList.add(teams2);
+            }
+        }
+        log.info("resultTeamList: "+resultTeamList.toString());
+
+        return resultTeamList;
     }
 
     @Transactional

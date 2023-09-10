@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 public class ResultForm {
-    private Object project;
+    private Object object1;
     private String string;
+    private Object object2;
 }
