@@ -10,8 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 public class ProjectsForm {
-    @JsonProperty("id")
-    private  Long id;
+    @JsonProperty("projectId")
+    private  Long projectId;
 
     @JsonProperty("professorId")
     private Long professorId;
@@ -27,7 +27,7 @@ public class ProjectsForm {
     // dto -> entity 연결
     public Projects2 toEntity(ProjectsForm dto) {
         Projects2 entity = new Projects2();
-        entity.setId(dto.getId());
+        entity.setProjectId(dto.getProjectId());
         entity.setProfessorId(dto.getProfessorId());
         entity.setProjectName(dto.getProjectName());
         entity.setSemester(dto.getSemester());

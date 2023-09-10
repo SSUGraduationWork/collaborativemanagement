@@ -13,7 +13,7 @@ public interface Projects2Repository extends CrudRepository<Projects2, Long> {
 
     Projects2 findByProjectName(String projectName);
     ArrayList<Projects2> findByProfessorIdAndSemester(Long professrId, String semester);
-    Projects2 findByProfessorIdAndId(Long professorId, Long id);
+    Projects2 findByProfessorIdAndProjectId(Long professorId, Long id);
 
 //    @Query(SELECT * from (Members2 M inner join co_work.Projects2 P on M.id = P.professor_id)
 //            INNER JOIN Teams2 T on P.professor_id = T.project_id)

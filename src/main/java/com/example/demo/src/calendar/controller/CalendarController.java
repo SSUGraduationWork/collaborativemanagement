@@ -263,6 +263,25 @@ public class CalendarController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    //2-3. project 수정
+    @PatchMapping("/dashboard/projects")
+    public ResponseEntity<ResponseData> editProject(@RequestBody ProjectsForm form) {
+        //입력에 원하는 정보가 들어왔는지 확인
+        Projects2 projects = dashboardService.editProjects(form);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    //2-4. project 삭제
+    @DeleteMapping("/dashboard/projects/{projectId}")
+    public ResponseEntity<ResponseData> deleteProject(@PathVariable Long projectId) {
+        dashboardService.deleteProjects(projectId);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", null);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
     //semester에 따라 대시보드에 보이는 프로젝트 다름
     @GetMapping("/dashboard/projects/{professorId}/{semester}")
     public ResponseEntity<ResponseData> watchProjectsBySemester(@PathVariable Long professorId, @PathVariable String semester) {
@@ -410,4 +429,23 @@ public class CalendarController {
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teams2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    //2-5. team 수정
+    @PatchMapping("/dashboard/teams")
+    public ResponseEntity<ResponseData> updateTeams(@RequestBody TeamsForm form) {
+        Teams2 teams = dashboardService.editTeams(form);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", teams);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    //2-6. teams 삭제
+    @DeleteMapping("/dashboard/teams/{teamId}")
+    public ResponseEntity<ResponseData> deleteTeams(@PathVariable Long teamId) {
+        dashboardService.deleteTeams(teamId);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", null);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
 }

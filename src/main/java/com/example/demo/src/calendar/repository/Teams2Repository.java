@@ -12,4 +12,6 @@ public interface Teams2Repository extends CrudRepository<Teams2, Long> {
     Teams2 findByTeamIdAndProjectId(Long teamId, Long projectId);
 
     Teams2 findByTeamName(String teamName);
+
+    Teams2 findByTeamId(Long teamId);
 }

@@ -5,6 +5,7 @@ import com.example.demo.src.calendar.dto.ProjectsForm;
 import com.example.demo.src.calendar.dto.TeamsForm;
 import com.example.demo.src.calendar.entity.*;
 import com.example.demo.src.calendar.repository.*;
+import com.example.demo.src.file.domain.Teams;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +68,7 @@ public class DashboardService {
         }
         return checkform;
     }
+
 
     @Transactional
     public boolean checkTeamsForm(TeamsForm form) {
@@ -262,6 +264,25 @@ public class DashboardService {
     }
 
     @Transactional
+    public Projects2 editProjects(ProjectsForm dto) {
+        Projects2 project = projects2Repository.findById(dto.getProjectId()).orElse(null);
+        if (dto.getProjectName() != null) {
+            if (dto.getSemester() != null) {
+                project.setProjectName(dto.getProjectName());
+                project.setSemester(dto.getSemester());
+            }
+        }
+        return project;
+    }
+
+    @Transactional
+    public void deleteProjects(Long projectId) {
+        Projects2 project = projects2Repository.findById(projectId).orElse(null);
+
+        projects2Repository.delete(project);
+    }
+
+    @Transactional
     public List<Projects2> watchProjectsBySemester(Long professor_id, String semester) {
         List<Projects2> projects2List = projects2Repository.findByProfessorIdAndSemester(professor_id, semester);
 
@@ -329,7 +350,7 @@ public class DashboardService {
     @Transactional
     public boolean matchProfessorAndProject(Long professorId, Long projectId) {
         boolean check = false;
-        Projects2 projects2 = projects2Repository.findByProfessorIdAndId(professorId, projectId);
+        Projects2 projects2 = projects2Repository.findByProfessorIdAndProjectId(professorId, projectId);
         if (projects2 != null) {
             check = true;
         }
@@ -343,28 +364,21 @@ public class DashboardService {
         return projectName;
     }
 
-//    @Transactional
-//    public TeamMembers2 addTeamMember(Long projectId ,Long teamId, Long userId) {
-//        TeamMembers2 entity = new TeamMembers2();
-//        entity.setTeamId(teamId);
-//        entity.setUserId(userId);
-//        teamMembers2Repository.save(entity);
-//        return entity;
-//    }
+    @Transactional
+    public Teams2 editTeams(TeamsForm dto) {
+        Teams2 team = teams2Repository.findByTeamId(dto.getTeamId());
 
-//    @Transactional
-//    public List<Teams2> getTeamsInProjects(Long projectId) {
-//        Projects2 projects = projects2Repository.findByProjectId(projectId);
-//        log.info(projects.toString());
-//        log.info(projects.getTeams().toString());
-//        if (projects != null) {
-//            return projects.getTeams();
-//        }
-//        else {
-//            return Collections.emptyList();
-//        }
-//      }
+        if (dto.getTeamName() != null) {
+            team.setTeamName(dto.getTeamName());
+        }
+        return team;
+    }
 
+    @Transactional
+    public void deleteTeams(Long teamId) {
+        Teams2 team = teams2Repository.findByTeamId(teamId);
 
+        teams2Repository.delete(team);
+    }
 
 }
