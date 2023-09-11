@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class WorkService {
-    private WorkRepository workRepository;
-    private TeamRepository teamRepository;
-private BoardRepository boardRepository;
+
 private WorkerRepository workerRepository;
     public List<WorkResponse> workList(Long userId,Long teamId){
         List<Works> workList=workerRepository.findAllByUserIdAndTeamId(userId,teamId);

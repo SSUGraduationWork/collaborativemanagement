@@ -1,7 +1,7 @@
 package com.example.demo.src.file.dto.request;
 
-import lombok.Data;
 
+import lombok.Data;
 
 @Data
 public class BoardWriteRequest{

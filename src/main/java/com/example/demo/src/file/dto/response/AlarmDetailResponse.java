@@ -1,5 +1,6 @@
 package com.example.demo.src.file.dto.response;
 
+
 import com.example.demo.src.file.domain.Alarms;
 import jakarta.persistence.Column;
 import lombok.Builder;
@@ -24,7 +25,6 @@ public class AlarmDetailResponse {
     @Column(name = "picture_url", length = 100)
     private String pictureUrl;
 
-    private Long userId;
 
     private Integer feedbackYn;//수정 요청 여부 0이면 수정 거부한거임-> 추후에 변경예정
     //0과1로 하면 생기는 문제점이 피드백을 하지 않은 사람도 거부한걸로 됨
@@ -35,9 +35,8 @@ public class AlarmDetailResponse {
     private Long boardId;
 
     @Builder
-    public AlarmDetailResponse(Long alarmId, Long userId,Long writerId,Long boardId, boolean seen,Integer feedbackYn,String content, String redirectUrl,LocalDateTime createdTime,String pictureUrl, String alarmKind){
+    public AlarmDetailResponse(Long alarmId, Long writerId,Long boardId, boolean seen,Integer feedbackYn,String content, String redirectUrl,LocalDateTime createdTime,String pictureUrl, String alarmKind){
         this.alarmId = alarmId;
-        this.userId=userId;
         this.writerId=writerId;
         this.boardId=boardId;
         this.seen = seen;
@@ -52,7 +51,6 @@ public class AlarmDetailResponse {
     public static AlarmDetailResponse from(Alarms alarms) {
         return AlarmDetailResponse.builder()
                 .alarmId(alarms.getAlarmId())
-                .userId(alarms.getUsers().getId())
                 .boardId(alarms.getBoards().getId())
                 .seen(alarms.isSeen())
                 .content(alarms.getContent())

@@ -2,9 +2,9 @@ package com.example.demo.src.file.dto.response;
 
 
 import com.example.demo.src.file.domain.Boards;
+
 import lombok.Builder;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 
@@ -20,6 +20,8 @@ private LocalDateTime createdTime;
 
 private Long viewCount;
 
+private Long workId;
+
 private String workName;
 
 private String writerName;
@@ -29,22 +31,18 @@ private Integer feedbackYn;
 private String pictureUrl;
 
 private Long userId;
-//사용자명과 작업명은 추후 추가해야함
-//private String username;
-
-//private String workname;
-// 생성자
 
 
     @Builder
     public BoardResponse(Long boardId, String title, Long viewCount,
-                         LocalDateTime createdTime, String workName,String writerName,
+                         LocalDateTime createdTime, String workName, Long workId, String writerName,
                          Integer feedbackYn,Long userId,String pictureUrl){
         this.boardId = boardId;
         this.title = title;
         this.viewCount=viewCount;
         this.createdTime=createdTime;
         this.workName=workName;
+        this.workId=workId;
         this.writerName=writerName;
         this.feedbackYn=feedbackYn;
         this.userId=userId;
@@ -58,6 +56,7 @@ private Long userId;
                 .viewCount(boards.getViewCnt())
                 .createdTime(boards.getCreatedAt())
                 .workName(boards.getWorks().getWorkName())
+                .workId(boards.getWorks().getId())
                 .writerName(boards.getUsers().getStudentNumber()+" "+ boards.getUsers().getUserName())
                 .userId(boards.getUsers().getId())
                 .pictureUrl(boards.getUsers().getPictureUrl())
