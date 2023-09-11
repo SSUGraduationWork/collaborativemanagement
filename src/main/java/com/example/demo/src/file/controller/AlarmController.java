@@ -13,16 +13,11 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins="http://localhost:8081")
+//@CrossOrigin(origins="http://localhost:8081")
 public class AlarmController {
 
     private final AlarmService alarmService;
-    private final AlarmRepository alarmRepository;
-    //알람 자세하게 확인하기
-    @GetMapping("/alarm/view/{alarmId}")
-    public ResponseEntity<Response<AlarmDetailResponse>>  viewAlarm(@PathVariable Long alarmId) {
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, alarmService.DetailAlarm(alarmId)));
-    }
+
 
     //멤버별로 알람 리스트 확인하기
     @GetMapping("/alarmList/view/{memberId}")

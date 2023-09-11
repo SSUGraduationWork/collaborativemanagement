@@ -13,8 +13,9 @@ import java.util.Optional;
 @Repository
 public interface WorkerRepository extends JpaRepository<Workers, Workers.WorkerId> {
 
-    @Query("SELECT w.works FROM Workers w WHERE w.id.userId = :userId AND w.teams.id = :teamId")
+    @Query("SELECT w.works FROM Workers w WHERE w.id.userId = :userId AND w.teams.id = :teamId AND w.writeYn=false")
     List<Works> findAllByUserIdAndTeamId(@Param("userId") Long userId, @Param("teamId") Long teamId);
-    // Find a specific worker by userId and workId
-    Optional<Workers> findByUsersIdAndWorksId(@Param("memberId") Long userId, @Param("workId") Long workId);
+
+    @Query("SELECT w FROM Workers w WHERE w.users.id = :userId AND w.works.id = :workId")
+    Optional<Workers> findByUsersIdAndWorksId(@Param("userId") Long userId, @Param("workId") Long workId);
 }

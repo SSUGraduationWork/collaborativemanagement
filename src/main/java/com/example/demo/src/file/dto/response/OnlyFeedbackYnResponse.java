@@ -1,8 +1,8 @@
 package com.example.demo.src.file.dto.response;
 
-import com.example.demo.src.file.domain.Boards;
+
 import com.example.demo.src.file.domain.FeedbackStatuses;
-import com.example.demo.src.file.domain.Feedbacks;
+
 import lombok.Builder;
 import lombok.Data;
 

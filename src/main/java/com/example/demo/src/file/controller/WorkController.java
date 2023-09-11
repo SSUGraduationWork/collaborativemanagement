@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins="http://localhost:8081")
+//@CrossOrigin(origins="http://localhost:8081")
 public class WorkController {
     private final WorkService workService;
 

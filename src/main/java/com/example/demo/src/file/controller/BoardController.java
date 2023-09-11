@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins="http://localhost:8081")
+//@CrossOrigin(origins="http://localhost:8081")
 public class BoardController {
 
     private final BoardService boardService;
@@ -42,12 +42,12 @@ public class BoardController {
 
     //파일 한번에 여러게 업로드 및 게시글 작성
     @PostMapping("/board/multiWrite/{memberId}/{teamId}/{workId}")
-    public ResponseEntity<Response<BoardResponse>> multipleBoardWriteForm(@Valid BoardWriteRequest request,
+    public void multipleBoardWriteForm(@Valid BoardWriteRequest request,
                                                                   @PathVariable("memberId") Long memberId,
                                                                   @PathVariable("teamId") Long teamId,
                                                                   @PathVariable("workId") Long workId,
                                                                   @PathVariable(value = "files", required = false) MultipartFile[] files) throws Exception{
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.multiWrite(request,memberId,teamId,workId,files)));
+         boardService.multiWrite(request,memberId,teamId,workId,files);
     }
 
 
@@ -60,7 +60,6 @@ public class BoardController {
         List<BoardResponse> boardResponses = boardService.boardList(memberId, teamId);
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardResponses));
     }
-
 
 
     //특정 게시글 눌렀을 때 상세 페이지 생성

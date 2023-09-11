@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins="http://localhost:8081")
+//@CrossOrigin(origins="http://localhost:8081")
 public class FeedbackController {
 
     private final FeedbackService feedbackService;
@@ -43,17 +43,7 @@ public class FeedbackController {
         feedbackService.reFeedback(boardId,writerId,isApproved);
     }
 
-/*
-    //피드백 보기
-    @GetMapping("/comment/{boardId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Response<List<BoardFeedbackResponse>>>  commentView(@PathVariable("boardId") Long boardId){
-       return  ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.feedbackView(boardId)));
 
-    }
-
-
- */
     //피드백 보기
     //front에서 피드백을 쓰자마자 바로 보여주기 위해서 addComment라는 변수에 담아서 화면에 보여줬음.
     //feedback의 거절 승인은 한번하여 번복이 없음. feedback 승인,여부가 필요함

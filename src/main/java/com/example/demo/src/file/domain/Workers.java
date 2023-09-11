@@ -21,18 +21,18 @@ public class Workers {
     @EmbeddedId
     private WorkerId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",  insertable = false, updatable = false)
     private Members users;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_id",  insertable = false, updatable = false)
     private Works works;
 
     @Column(name = "write_yn")
     private boolean writeYn;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", referencedColumnName = "team_id")
     private Teams teams;
 
