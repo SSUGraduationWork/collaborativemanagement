@@ -1,6 +1,7 @@
 package com.example.demo.src.file.domain;
 
 import com.example.demo.src.file.FeedbackTimeEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Alarms extends FeedbackTimeEntity {
 
     @Id

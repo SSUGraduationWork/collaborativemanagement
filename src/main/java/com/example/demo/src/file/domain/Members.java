@@ -1,6 +1,8 @@
 package com.example.demo.src.file.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +21,7 @@ import static jakarta.persistence.CascadeType.ALL;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Members  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,24 +57,31 @@ public class Members  {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<Boards> boardsList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "writers", cascade = ALL, orphanRemoval = true)
     private List<Feedbacks> feedbacksList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "professor", cascade = ALL, orphanRemoval = true)
     private List<Projects> projectList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<TeamMembers> memberList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<Alarms> alarmsList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = ALL, orphanRemoval = true)
     private List<Workers> workersList = new ArrayList<>();
 

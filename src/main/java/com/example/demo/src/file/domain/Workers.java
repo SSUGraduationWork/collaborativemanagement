@@ -1,5 +1,6 @@
 package com.example.demo.src.file.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "Workers")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Workers {
 
     @EmbeddedId

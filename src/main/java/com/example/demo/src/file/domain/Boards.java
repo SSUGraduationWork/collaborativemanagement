@@ -1,7 +1,10 @@
 package com.example.demo.src.file.domain;
 
 import com.example.demo.src.file.BaseTimeEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -16,6 +19,7 @@ import static jakarta.persistence.CascadeType.ALL;
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Boards extends BaseTimeEntity {
 
     @Id
@@ -53,16 +57,20 @@ public class Boards extends BaseTimeEntity {
     private boolean feedbackYn;
 
     //== 게시글을 삭제하면 달려있는 댓글 모두 삭제 ==//
+    @JsonIgnore
     @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
     private List<Feedbacks> feedbacksList = new ArrayList<>();
 
     //== 게시글을 삭제하면 달려있는 댓글 모두 삭제 ==//
+    @JsonIgnore
     @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
     private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "boards", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Files> fileList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
     private List<Alarms> alarmsList = new ArrayList<>();
 

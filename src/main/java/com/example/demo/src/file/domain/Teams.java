@@ -1,5 +1,7 @@
 package com.example.demo.src.file.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,6 +18,7 @@ import static jakarta.persistence.CascadeType.ALL;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Teams {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,19 +35,23 @@ public class Teams {
     @Column(name = "team_number")
     private Integer teamNumber;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<Boards> boardsList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<TeamMembers> teamList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<Works> workList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
     private List<Workers> workerList = new ArrayList<>();
 
