@@ -1,6 +1,8 @@
 package com.example.demo.src.file.domain;
 
 import com.example.demo.src.file.WorkTimeEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +19,7 @@ import static jakarta.persistence.CascadeType.ALL;
 @Setter
 @Table(name ="Works")
 @EqualsAndHashCode(callSuper = false)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Works extends WorkTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,9 +47,11 @@ public class Works extends WorkTimeEntity {
     @Column(name = "del_yn")
     private boolean delYn;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "works", cascade = ALL, orphanRemoval = true)
     private List<Boards> boardsList = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "works", cascade = ALL, orphanRemoval = true)
     private List<Workers> workersList = new ArrayList<>();
 

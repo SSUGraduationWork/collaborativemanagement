@@ -20,33 +20,21 @@ private LocalDateTime createdTime;
 
 private Long viewCount;
 
-private Long workId;
-
-private String workName;
-
-private String writerName;
-
 private Integer feedbackYn;
-
-private String pictureUrl;
-
 private Long userId;
-
+private Long workId;
 
     @Builder
     public BoardResponse(Long boardId, String title, Long viewCount,
-                         LocalDateTime createdTime, String workName, Long workId, String writerName,
-                         Integer feedbackYn,Long userId,String pictureUrl){
+                         LocalDateTime createdTime,
+                         Integer feedbackYn, Long userId,Long workId){
         this.boardId = boardId;
         this.title = title;
         this.viewCount=viewCount;
         this.createdTime=createdTime;
-        this.workName=workName;
-        this.workId=workId;
-        this.writerName=writerName;
         this.feedbackYn=feedbackYn;
         this.userId=userId;
-        this.pictureUrl=pictureUrl;
+        this.workId=workId;
     }
 
     public static BoardResponse from(Boards boards) {
@@ -55,11 +43,8 @@ private Long userId;
                 .title(boards.getTitle())
                 .viewCount(boards.getViewCnt())
                 .createdTime(boards.getCreatedAt())
-                .workName(boards.getWorks().getWorkName())
-                .workId(boards.getWorks().getId())
-                .writerName(boards.getUsers().getStudentNumber()+" "+ boards.getUsers().getUserName())
                 .userId(boards.getUsers().getId())
-                .pictureUrl(boards.getUsers().getPictureUrl())
+                .workId(boards.getWorks().getId())
                 .build();
     }
 }

@@ -4,13 +4,15 @@
 package com.example.demo.src.file.controller;
 
 import com.example.demo.src.file.Repository.FileRepository;
+import com.example.demo.src.file.Repository.TeamMemberRepository;
+import com.example.demo.src.file.Repository.WorkRepository;
 import com.example.demo.src.file.Service.BoardService;
+import com.example.demo.src.file.common.BoardListResponse;
 import com.example.demo.src.file.common.CommonCode;
 import com.example.demo.src.file.common.Response;
-import com.example.demo.src.file.domain.Files;
+import com.example.demo.src.file.domain.*;
 import com.example.demo.src.file.dto.request.BoardWriteRequest;
-import com.example.demo.src.file.dto.response.BoardDetailResponse;
-import com.example.demo.src.file.dto.response.BoardResponse;
+import com.example.demo.src.file.dto.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 @RestController
 @AllArgsConstructor
@@ -32,6 +35,8 @@ public class BoardController {
 
     private final BoardService boardService;
     private FileRepository fileRepository;
+    private TeamMemberRepository teamMemberRepository;
+    private WorkRepository workRepository;
 
     //파일 한번에 여러게 업로드 및 게시글 작성
     @PostMapping("/board/upcount/{boardId}")
@@ -42,23 +47,37 @@ public class BoardController {
 
     //파일 한번에 여러게 업로드 및 게시글 작성
     @PostMapping("/board/multiWrite/{memberId}/{teamId}/{workId}")
-    public void multipleBoardWriteForm(@Valid BoardWriteRequest request,
-                                                                  @PathVariable("memberId") Long memberId,
-                                                                  @PathVariable("teamId") Long teamId,
-                                                                  @PathVariable("workId") Long workId,
-                                                                  @PathVariable(value = "files", required = false) MultipartFile[] files) throws Exception{
-         boardService.multiWrite(request,memberId,teamId,workId,files);
+    public ResponseEntity<Response<multiWriteResponse>> multipleBoardWriteForm(@Valid BoardWriteRequest request,
+                                                                               @PathVariable("memberId") Long memberId,
+                                                                               @PathVariable("teamId") Long teamId,
+                                                                               @PathVariable("workId") Long workId,
+                                                                               @PathVariable(value = "files", required = false) MultipartFile[] files) throws Exception{
+        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST,boardService.multiWrite(request,memberId,teamId,workId,files)));
     }
 
 
     //게시글 리스트+페이징 추후 필요+정렬 필요
     @GetMapping("/board/list/{memberId}/{teamId}")
-    public ResponseEntity<Response<List<BoardResponse>>> boardList(
+    public ResponseEntity<BoardListResponse<?>> boardList(
             @PathVariable("memberId") Long memberId,
             @PathVariable("teamId") Long teamId) {
 
         List<BoardResponse> boardResponses = boardService.boardList(memberId, teamId);
-        return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardResponses));
+        List<Members> teamMemberlist=teamMemberRepository.findTeamById(teamId);
+        List<WorkResponse> workResponses = new ArrayList<>();
+        List<BoardMemberResponse> boardMemberResponses = new ArrayList<>();
+        List<Works> worksList=workRepository.findWorksByTeamId(teamId);
+        for(Works works: worksList){
+            WorkResponse workResponse=WorkResponse.from(works);
+            workResponses.add(workResponse);
+        }
+        for(Members members: teamMemberlist){
+            BoardMemberResponse boardMemberResponse=BoardMemberResponse.from(members);
+            boardMemberResponses.add(boardMemberResponse);
+        }
+
+
+        return ResponseEntity.ok(BoardListResponse.of(CommonCode.GOOD_REQUEST, boardResponses,workResponses,boardMemberResponses));
     }
 
 
@@ -93,12 +112,12 @@ public class BoardController {
 
     //다중 파일 게시판 수정
     @PostMapping("/multiboard/update/{boardId}/{memberId}/{teamId}/{workId}") //mod_compl, 수정을 완료했는지
-    public ResponseEntity<Response<BoardResponse>> multiboardModify(@PathVariable("boardId") Long boardId,
+    public ResponseEntity<Response<multiWriteResponse>> multiboardModify(@PathVariable("boardId") Long boardId,
                                                                     @PathVariable("memberId") Long memberId,
                                                                     @PathVariable("teamId") Long teamId,
                                                                     @PathVariable("workId") Long workId,
                                                                @Valid BoardWriteRequest request,
-                                                               @RequestParam("files") MultipartFile[] files) throws Exception {
+                                                               @PathVariable(value = "files", required = false) MultipartFile[] files) throws Exception {
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, boardService.multiReWrite(boardId,workId,request, files )));
     }
 
