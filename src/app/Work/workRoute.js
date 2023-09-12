@@ -8,14 +8,14 @@ module.exports = (app) => {
     app.post('/work/:teamId',work.postWork);
 
     // 3. 특정 작업 조회 API
-    app.get('/work/detail/:workId', work.getWorkById);
+    app.get('/work/detail/:teamId/:workId', work.getWorkById);
 
     //4. 특정 작업 삭제 API
-    app.delete('/work/:workId', work.deleteWork);
+    app.delete('/work/:teamId/:workId', work.deleteWork);
 
     //5. 특정 작업 전체 수정 API
-    app.put('/work/:workId', work.putWork);
+    app.put('/work/:teamId/:workId', work.putWork);
 
     //6. 특정 작업 하나 수정 API
-    app.patch('/work/:workId/:updateValue', work.patchWork);
+    app.post('/work/:teamId/:workId/:updateValue', work.patchWork);
 };

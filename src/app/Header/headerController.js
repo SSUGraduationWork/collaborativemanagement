@@ -13,10 +13,12 @@ exports.getHeaderInfo = async (req, res) => {
         const {userId, teamId} = req.query;
 
         let HeaderInfo = await headerProvider.retrieveUser(userId);
+        console.log(HeaderInfo);
         if (teamId){
             const teamName = await headerProvider.retrieveTeam(teamId);
             HeaderInfo = {...HeaderInfo, ...teamName};
         }
+
         return res.send(response(baseResponse.SUCCESS, HeaderInfo));
     } catch(err){
         console.log(err);

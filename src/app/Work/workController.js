@@ -39,7 +39,7 @@ exports.postWork = async (req, res) => {
 /**
  * API No. 3
  * API Name : 특정 작업 조회 API
- * [GET] /work/detail/:workId
+ * [GET] /work/detail/:teamId/:workId
  */
 exports.getWorkById = async (req, res) => {
     try {
@@ -55,7 +55,7 @@ exports.getWorkById = async (req, res) => {
 /**
  * API No. 4
  * API Name : 특정 작업 삭제 API
- * [DELETE] /work/:workId
+ * [DELETE] /work/:teamId/:workId
  */
 exports.deleteWork = async function (req, res) {
 
@@ -78,7 +78,6 @@ exports.putWork = async function (req, res) {
 
 
     const {workId, teamId} = req.params;
-    console.log(req.params);
     const {work_name, worker, end_date, importance, status} = req.body;
 
     let worker_arr = JSON.parse(worker);
@@ -96,7 +95,7 @@ exports.putWork = async function (req, res) {
 /**
  * API No. 6
  * API Name : 작업명, 담당자, 마감일, 중요도, 상태 중 하나 수정 API
- * [PUT] /work/:workId/:updateValue
+ * [POST] /work/:teamId/:workId/:updateValue
  * body : work_namre or end_date or importance or status or worker
  * 수정하려는 값: updateValue, 수정 내용 : val
  */
