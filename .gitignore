@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 application-oauth.properties
+src/main/resources/static/files
 
 ### STS ###
 .apt_generated
