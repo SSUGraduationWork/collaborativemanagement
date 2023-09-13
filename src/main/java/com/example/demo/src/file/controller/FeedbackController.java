@@ -35,11 +35,10 @@ public class FeedbackController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Response<FeedbackResponse>>  commentSave(@PathVariable("boardId") Long boardId,
                                                                    @PathVariable("writerId") Long writerId,
-                                                                   FeedbackRequest request,
+                                                                   @RequestBody FeedbackRequest request,
                                                                    @PathVariable("isApproved") Integer isApproved){
         return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, feedbackService.save(boardId,writerId,request,isApproved)));
     }
-
     //피드백 반영하여 수정한 게시판에 대한 재수락, 재수정
     @PostMapping("/recomment/{boardId}/{writerId}/{isApproved}")
     @ResponseStatus(HttpStatus.CREATED)

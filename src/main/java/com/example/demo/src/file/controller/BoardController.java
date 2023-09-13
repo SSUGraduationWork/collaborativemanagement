@@ -3,6 +3,8 @@
 
 package com.example.demo.src.file.controller;
 
+import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponseStatus;
 import com.example.demo.src.file.Repository.FileRepository;
 import com.example.demo.src.file.Repository.TeamMemberRepository;
 import com.example.demo.src.file.Repository.WorkRepository;
@@ -24,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ServerErrorException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,13 +101,13 @@ public class BoardController {
     }
 
     @DeleteMapping("/files/delete")
-    public ResponseEntity<String> deleteFiles(@RequestBody List<Long> fileIdList) {
+    public ResponseEntity<Response<String>> deleteFiles(@RequestBody List<Long> fileIdList) throws BaseException{
         try {
             boardService.deleteFileSystem(fileIdList); // 서비스 메서드 호출
-            return ResponseEntity.ok("파일 삭제 성공");
+            return ResponseEntity.ok(Response.of(CommonCode.GOOD_REQUEST, "파일 삭제 성공"));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 삭제 실패");
+            throw new BaseException(BaseResponseStatus.SERVER_ERROR);
         }
     }
 
