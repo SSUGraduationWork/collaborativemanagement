@@ -1,13 +1,17 @@
 package com.example.demo.src.file.controller;
 
+import com.example.demo.src.file.Repository.FeedbackRepository;
+import com.example.demo.src.file.Repository.FeedbackStatusRepository;
+import com.example.demo.src.file.Repository.TeamMemberRepository;
 import com.example.demo.src.file.Service.FeedbackService;
-import com.example.demo.src.file.common.CommonCode;
-import com.example.demo.src.file.common.FeedbackYnResponse;
-import com.example.demo.src.file.common.Response;
+import com.example.demo.src.file.common.*;
+import com.example.demo.src.file.domain.FeedbackStatuses;
 import com.example.demo.src.file.domain.Members;
 import com.example.demo.src.file.dto.request.FeedbackRequest;
 import com.example.demo.src.file.dto.response.BoardFeedbackResponse;
 import com.example.demo.src.file.dto.response.FeedbackResponse;
+import com.example.demo.src.file.dto.response.FeedbackStatusFeedbackYnUserIdResponse;
+import com.example.demo.src.file.dto.response.FeedbackStatusTeamMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +26,9 @@ import java.util.List;
 public class FeedbackController {
 
     private final FeedbackService feedbackService;
-
+    private final FeedbackStatusRepository feedbackStatusRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final FeedbackRepository feedbackRepository;
     //피드백 글쓰기
     //isApproved=0인경우 피드백 거부, isApproved=1인경우 피드백 승인
     @PostMapping("/comment/{boardId}/{writerId}/{isApproved}")
@@ -47,13 +53,19 @@ public class FeedbackController {
     //피드백 보기
     //front에서 피드백을 쓰자마자 바로 보여주기 위해서 addComment라는 변수에 담아서 화면에 보여줬음.
     //feedback의 거절 승인은 한번하여 번복이 없음. feedback 승인,여부가 필요함
-    @GetMapping("/comment/{boardId}/{memberId}")
+    @GetMapping("/comment/{boardId}/{memberId}/{teamId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<FeedbackYnResponse<List<BoardFeedbackResponse>>>  commentFeedbackView(@PathVariable("boardId") Long boardId,
-                                                                                                @PathVariable("memberId") Long memberId){
+    public ResponseEntity<CommentResponse<List<?>>>  commentFeedbackView(@PathVariable("boardId") Long boardId,
+                                                                         @PathVariable("memberId") Long memberId
+                                                                                    , @PathVariable("teamId") Long teamId){
+    //    Members members=feedbackService.getUsers(memberId);
 
-        Members members=feedbackService.getUsers(memberId);
-        return  ResponseEntity.ok(FeedbackYnResponse.of(CommonCode.GOOD_REQUEST, feedbackService.feedbackView(boardId),feedbackService.getFeedbackYn(boardId,memberId),members.getPictureUrl(),members.getUserName(),members.getStudentNumber()));
+
+        List<FeedbackStatusFeedbackYnUserIdResponse> feedbackStatusesList = feedbackStatusRepository.findFeedbackYnAndUserIdByBoardsId(boardId);
+        List<FeedbackStatusTeamMember> membersRepository=teamMemberRepository.findUserNameAndUserIdAndPictureUrlByTeamsId(teamId);
+        List<BoardFeedbackResponse> feedbacksList = feedbackRepository.findFeedbackByBoardsId(boardId);
+
+        return  ResponseEntity.ok(CommentResponse.of(CommonCode.GOOD_REQUEST, feedbacksList,feedbackStatusesList,membersRepository));
     }
 
 
