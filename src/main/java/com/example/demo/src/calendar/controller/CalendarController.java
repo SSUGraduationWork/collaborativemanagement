@@ -74,17 +74,23 @@ public class CalendarController {
         }
 
         //3. DB에 해당 date의 회의록이 존재하는지 여부에 따라 다르게 처리
-        boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
-        if (check == false) {                                     //Minutes2 DB에 해당 date 존재하지 않을 경우, 해당 정보로 minutes 생성
-            Minutes2 target = dashboardService.createMinutes(form);
-            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
-            return new ResponseEntity<>(responseData, HttpStatus.OK);
-        }
-        else {                                                    //Minutes2 DB에 해당 date 존재할 경우, 기존의 minutes 보여줌
-            Minutes2 original = dashboardService.getExistingMinutes(form.getDate());
-            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", original);
-            return new ResponseEntity<>(responseData, HttpStatus.OK);
-        }
+//        boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
+//        if (check == false) {                                     //Minutes2 DB에 해당 date 존재하지 않을 경우, 해당 정보로 minutes 생성
+//            Minutes2 target = dashboardService.createMinutes(form);
+//            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
+//            return new ResponseEntity<>(responseData, HttpStatus.OK);
+//        }
+//        else {                                                    //Minutes2 DB에 해당 date 존재할 경우, 기존의 minutes 보여줌
+//            Minutes2 original = dashboardService.getExistingMinutes(form.getDate());
+//            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", original);
+//
+//        }
+
+        //4. 팀아이디에 해당하는 회의록 생성
+        Minutes2 minutes = dashboardService.createMinutes(form);
+
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     //1-2(1). 회의록 조회(전체)
@@ -131,7 +137,16 @@ public class CalendarController {
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+    //1-2(4). 회의록이 존재하는 모든 날짜리스트
+    @GetMapping("/calendars/getExistMinutes/{teamId}/{currentMonth}")
+    public ResponseEntity<ResponseData> getExistDate(@PathVariable Long teamId, @PathVariable String currentMonth) {
+        //팀아이디에 해당하는 모든 minute 찾고 date 비교
+        List<String> list = dashboardService.findMinuteByDate(teamId, currentMonth);
 
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", list);
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
 
     //1-3. 회의록 수정 => 수정할때
     //해당 날짜가 존재하지 않을 경우 오류 발생
@@ -154,20 +169,22 @@ public class CalendarController {
             throw new MemberNotFoundException("Member Not Found");
         }
 
-        //2. 그에 맞게 처리
-        boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
-        if (check != true) {
-            throw new DateNotFoundException("Date Not Found");
-        }
-        MinutesForm minutes = dashboardService.editMinutes(form.getDate(), form);
+//        //2. 그에 맞게 처리
+//        boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
+//        if (check != true) {
+//            throw new DateNotFoundException("Date Not Found");
+//        }
+//        MinutesForm minutes = dashboardService.editMinutes(form.getDate(), form);
 
-        //3. 수정한 회의록에 not null이 존재할 경우 오류 발생
-        boolean formcheck = dashboardService.checkMinutesForm(minutes);
-        if (formcheck == false) {
-            throw new FormatBadRequestException("Fill In All");
-        }
+//        //3. 수정한 회의록에 not null이 존재할 경우 오류 발생
+//        boolean formcheck = dashboardService.checkMinutesForm(minutes);
+//        if (formcheck == false) {
+//            throw new FormatBadRequestException("Fill In All");
+//        }
+        Minutes2 minutes2 = dashboardService.findMinute(form.getTeamId(), form.getDate());
+        MinutesForm dtotarget = dashboardService.editMinutes(minutes2, form);
 
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", minutes);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", dtotarget);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -192,11 +209,14 @@ public class CalendarController {
         }
 
         //3. 처리
-        boolean check = dashboardService.checkDate(date); //check==true일 경우 DB에 해당 date 존재
-        if (check != true) {
-            throw new DateNotFoundException(String.format("Date[%s] Not Found", date));
-        }
-        dashboardService.deleteMinutes(date);
+//        boolean check = dashboardService.checkDate(date); //check==true일 경우 DB에 해당 date 존재
+//        if (check != true) {
+//            throw new DateNotFoundException(String.format("Date[%s] Not Found", date));
+//        }
+//
+
+        Minutes2 minutes2 = dashboardService.findMinute(teamId, date);
+        dashboardService.deleteMinutes(minutes2);
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", null);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }

@@ -205,9 +205,22 @@ public class DashboardService {
         return target;
     }
     @Transactional
-    public MinutesForm editMinutes(String date, MinutesForm dto) {
+    public List<String> findMinuteByDate(Long teamId, String currentMonth) {
+        List<String> resultList = new ArrayList<>();
+        ArrayList<Minutes2> teamMinuteList = minutes2Repository.findByTeamId(teamId);
+        for (Minutes2 minutes2: teamMinuteList) {
+            if (String.valueOf(minutes2.getDate()).startsWith(currentMonth)) {
+                String[] parts = minutes2.getDate().toString().split("-");
+                String lastDigit = parts[2];
+                resultList.add(lastDigit);
+            }
+        }
+        return resultList;
+    }
+    @Transactional
+    public MinutesForm editMinutes(Minutes2 minutes2, MinutesForm dto) {
         //현재 입력한 date가 repository에 존재할 경우 edit. orElseThrow()
-        Minutes2 minutes2 = minutes2Repository.findByDate(date);
+
         if (dto.getTitle() != null) {
             minutes2.updateTitle(dto.getTitle());
         }
@@ -220,12 +233,12 @@ public class DashboardService {
             minutes2.updateUserId(dto.getUserId());
         }
         MinutesForm dtotarget = minutes2.toDto(minutes2);
+
         return dtotarget;
     }
 
     @Transactional
-    public void deleteMinutes(String date) {
-        Minutes2 minutes2 = minutes2Repository.findByDate(date);
+    public void deleteMinutes(Minutes2 minutes2) {
         minutes2Repository.delete(minutes2);
     }
 
