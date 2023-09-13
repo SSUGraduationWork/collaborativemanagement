@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "Projects")
 @Getter
@@ -13,7 +17,7 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")
-    private Long id;
+    private Long projectId;
     @Column(name = "professor_id")
     private Long professorId;
     @Column(name = "project_name")
@@ -22,4 +26,7 @@ public class Project {
     private String semester;
     @Column(name="project_number")
     private Integer projectNumber;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private List<Team> teams = new ArrayList<>();
 }

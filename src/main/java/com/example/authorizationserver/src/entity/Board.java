@@ -2,7 +2,6 @@ package com.example.authorizationserver.src.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,7 +15,7 @@ import java.sql.Timestamp;
 public class Board {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
-    private Long id;
+    private Long boardId;
     @Column(name = "team_id")
     private Long teamId;
     @Column(name = "work_id")
