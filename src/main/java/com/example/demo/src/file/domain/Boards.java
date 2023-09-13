@@ -63,7 +63,7 @@ public class Boards extends BaseTimeEntity {
 
     //== 게시글을 삭제하면 달려있는 댓글 모두 삭제 ==//
     @JsonIgnore
-    @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "boards", cascade = ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
     @JsonIgnore

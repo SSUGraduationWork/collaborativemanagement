@@ -190,7 +190,7 @@ public class BoardService {
     public void reWrtieCompletionAlarm(Boards boards){
         // 해당 팀에 속한 모든 멤버 가져와서 FeedbackStatuses에 추가
         List<Members> allMembers = boards.getTeams().getAllMembers();
-        List<FeedbackStatuses> feedbackStatusesList=feedbackStatusRepository.findAllByBoardsId(boards.getId());
+        List<FeedbackStatuses> feedbackStatusesList=feedbackStatusRepository.findByBoardsId(boards.getId());
 
 
         for (int i = 0; i < allMembers.size(); i++) {

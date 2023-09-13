@@ -44,7 +44,7 @@ public class Teams {
     private List<TeamMembers> teamList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "teams", cascade = ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FeedbackStatuses> feedbackStatusList = new ArrayList<>();
 
     @JsonIgnore

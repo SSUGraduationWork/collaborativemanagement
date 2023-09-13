@@ -18,12 +18,15 @@ public class BoardFeedbackResponse  {
     private String comment;
 
     private LocalDateTime createdAt;
-    private Integer studentNumber;
+    private Long userId;
+    /*
     private String userName;
 
     private String pictureUrl;
 
     private Integer modReq;
+
+     */
     public BoardFeedbackResponse() {
 
     }
@@ -34,26 +37,20 @@ public class BoardFeedbackResponse  {
 
     @Builder
     public BoardFeedbackResponse (Long feedbackId, String comment,LocalDateTime createdAt,
-                             Integer studentNumber,String userName,String pictureUrl, Integer modReq){
+                             Long userId){
 
         this.feedbackId=feedbackId;
         this.comment=comment;
         this.createdAt=createdAt;
-        this.studentNumber=studentNumber;
-        this.userName=userName;
-        this.pictureUrl=pictureUrl;
-        this.modReq=modReq;
+        this.userId=userId;
     }
 
-    public static BoardFeedbackResponse from(Feedbacks feedbacks, FeedbackStatuses feedbackStatuses) {
+    public static BoardFeedbackResponse from(Feedbacks feedbacks) {
         return BoardFeedbackResponse.builder()
                 .feedbackId(feedbacks.getId())
                 .comment(feedbacks.getComment())
                 .createdAt(feedbacks.getCreatedAt())
-                .studentNumber(feedbacks.getWriters().getStudentNumber())
-                .userName(feedbacks.getWriters().getUserName())
-                .pictureUrl(feedbacks.getWriters().getPictureUrl())
-                .modReq(feedbackStatuses.getFeedbackYn())
+                .userId(feedbacks.getWriters().getId())
                 .build();
     }
 }
