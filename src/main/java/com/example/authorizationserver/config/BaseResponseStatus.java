@@ -24,6 +24,7 @@ public enum BaseResponseStatus {
     INVALID_USER_JWT(false,HttpStatus.FORBIDDEN.value(),"권한이 없는 유저의 접근입니다."),
     RESPONSE_ERROR(false, HttpStatus.NOT_FOUND.value(), "값을 불러오는데 실패하였습니다."),
 
+    FORBIDDEN(false, HttpStatus.FORBIDDEN.value(), "접근 권한이 없습니다."),
     // users
     USERS_EMPTY_USER_ID(false, HttpStatus.BAD_REQUEST.value(), "유저 아이디 값을 확인해주세요."),
     USER_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "유저가 존재하지 않습니다."),
@@ -36,7 +37,7 @@ public enum BaseResponseStatus {
 
 
     /**
-     * 50 : Database, Server 오류
+     * 500 : Database, Server 오류
      */
     DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하였습니다."),
     SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
