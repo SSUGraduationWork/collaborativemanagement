@@ -94,6 +94,14 @@ public class DashboardService {
         return check;
     }
 
+    @Transactional
+    public boolean checkProjectIdAndTeamId(Long projectId, Long teamId) {
+        boolean check = false;
+        if (projects2Repository.findById(projectId) != null || teams2Repository.findById(teamId) != null) {
+            check = true;
+        }
+        return check;
+    }
     //2-3. 해당 project가 존재하는지: projectId로
     @Transactional
     public boolean checkProjectId(Long projectId) {

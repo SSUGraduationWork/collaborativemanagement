@@ -215,31 +215,19 @@ public class CalendarController {
     //2-3. team 생성 => 학생. Dashboard에서 생성할 것
     @PostMapping("/dashboard/teams/{studentId}")
     public ResponseEntity<ResponseData> createTeams(@RequestBody TeamsForm form, @PathVariable Long studentId) throws AlreadyExistException {
-        //1. Team form의 not null이 모두 들어왔는지 확인
-        boolean formcheck = dashboardService.checkTeamsForm(form);
-        if (formcheck == false) {
-            throw new FormatBadRequestException("Fill In All");
-        }
-
-        //3. 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
-        boolean check = dashboardService.checkProjectId(form.getProjectId()); //check==true일 경우 DB에 해당 date 존재
-        if (check == false) {
-            throw new ProjectNotFoundException("Project Not Found");
-        }
-
-        //4. teamRepository에서 teamName이 겹치지 않는지 확인
+        //1. teamRepository에서 teamName이 겹치지 않는지 확인
         boolean checkTeamName = dashboardService.checkTeamName(form.getTeamName());
 
         if (checkTeamName == true) {
             throw new AlreadyExistException("Team Already Exist");
         }
 
-        //1. 팀생성
+        //2. 팀생성
         Teams2 teams2 = dashboardService.createTeams(form);
-        //2. 팀멤버 테이블 추가
+        //3. 팀멤버 테이블 추가
         dashboardService.createTeamsMembers(teams2.getTeamId(), studentId);
 
-        //3. 프로젝트와 팀 count 1씩
+        //4. 프로젝트와 팀 count 1씩
         Teams2 target = dashboardService.countNums(teams2.getTeamId(), teams2.getProjectId());
 
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
@@ -249,25 +237,21 @@ public class CalendarController {
     //2-5. 1) 학생이 보낸 URL(team으로 직접 들어올 경우) => team_number 1 증가 + project_number 1 증가
     @PatchMapping("/dashboard/{projectId}/{teamId}/{userId}")
     public ResponseEntity<ResponseData> countNumbers(@PathVariable Long projectId, @PathVariable Long teamId, @PathVariable Long userId) {
-        //1. Members2 테이블에 존재하는지 + role이 학생인지 확인
-        boolean membercheck = dashboardService.checkMember(userId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(userId);
-        if (!professorcheck.equals("student")) {
-            throw new MemberNotFoundException("Not Student");
-        }
-
         //2. 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
         boolean checkProject = dashboardService.checkProjectId(projectId); //check==true일 경우 DB에 해당 date 존재
         if (checkProject == false) {
             throw new ProjectNotFoundException("Project Not Found");
         }
+
         //3. 해당 team이 존재하는지
         boolean checkTeam = dashboardService.checkTeam(teamId);
         if (checkTeam == false) {
             throw new TeamNotFoundException("Team Not Found");
+        }
+
+        boolean check = dashboardService.checkProjectIdAndTeamId(projectId, teamId);
+        if (check == false) {
+            throw new ProjectAndTeamNotFoundException("Project and Team Not Found");
         }
 
         //4. 이미 멤버 테이블에 존재하는지 확인
