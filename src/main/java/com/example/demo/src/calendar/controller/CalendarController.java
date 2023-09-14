@@ -63,29 +63,6 @@ public class CalendarController {
             throw new FormatBadRequestException("Fill In All");
         }
 
-        //2. teamId가 존재하는지 + 해당 team member에 사용자가 존재하는지
-        boolean teamcheck = dashboardService.checkTeam(form.getTeamId());
-        if (teamcheck == false) {
-            throw new TeamNotFoundException("Team Not Found");
-        }
-        boolean teamMembercheck = dashboardService.checkTeamMember(form.getTeamId(), form.getUserId());
-        if (teamMembercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-
-        //3. DB에 해당 date의 회의록이 존재하는지 여부에 따라 다르게 처리
-//        boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
-//        if (check == false) {                                     //Minutes2 DB에 해당 date 존재하지 않을 경우, 해당 정보로 minutes 생성
-//            Minutes2 target = dashboardService.createMinutes(form);
-//            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", target);
-//            return new ResponseEntity<>(responseData, HttpStatus.OK);
-//        }
-//        else {                                                    //Minutes2 DB에 해당 date 존재할 경우, 기존의 minutes 보여줌
-//            Minutes2 original = dashboardService.getExistingMinutes(form.getDate());
-//            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", original);
-//
-//        }
-
         //4. 팀아이디에 해당하는 회의록 생성
         Minutes2 minutes = dashboardService.createMinutes(form);
 
@@ -97,7 +74,7 @@ public class CalendarController {
     //조회할 것이 없을 경우 null 출력
     @GetMapping("/calendars/minutes/all/{teamId}/{userId}")
     public ResponseEntity<ResponseData> getAllMinutes(@PathVariable Long teamId, @PathVariable Long userId) {
-        //userId가 해당팀의 멤버인지 확인
+
 
         //전체 조회
         List<Minutes2> minutes2List = dashboardService.watchAll(teamId);
@@ -112,9 +89,6 @@ public class CalendarController {
     //조회할 것이 없을 경우 null 출력
     @GetMapping("/calendars/minutes/all/{teamId}/{yearMonth}/{userId}")
     public ResponseEntity<ResponseData> getAllMinutes(@PathVariable Long teamId,@PathVariable String yearMonth, @PathVariable Long userId) {
-        //userId가 해당팀의 멤버인지 확인
-
-
         // 부분 조회
         List<Minutes2> minutes2List = dashboardService.watchDates(teamId, yearMonth);
         if (minutes2List == null) {
@@ -137,11 +111,12 @@ public class CalendarController {
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
     //1-2(4). 회의록이 존재하는 모든 날짜리스트
     @GetMapping("/calendars/getExistMinutes/{teamId}/{currentMonth}")
     public ResponseEntity<ResponseData> getExistDate(@PathVariable Long teamId, @PathVariable String currentMonth) {
         //팀아이디에 해당하는 모든 minute 찾고 date 비교
-        List<String> list = dashboardService.findMinuteByDate(teamId, currentMonth);
+        List<Integer> list = dashboardService.findMinuteByDate(teamId, currentMonth);
 
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", list);
 
@@ -152,35 +127,6 @@ public class CalendarController {
     //해당 날짜가 존재하지 않을 경우 오류 발생
     @PatchMapping("/calendars/minutes")
     public ResponseEntity<ResponseData> editMinutes(@RequestBody MinutesForm form) {
-        //수정이므로 아래 과정은 없어도 될듯
-//        //1. 원하는 정보가 모두 들어오지 않았을 경우 오류 발생
-//        boolean formcheck = dashboardService.checkMinutesForm(form);
-//        if (formcheck == false) {
-//            throw new FormatBadRequestException("Fill In All");
-//        }
-
-        //1. teamId가 존재하는지 + 해당 team member에 사용자가 존재하는지
-        boolean teamcheck = dashboardService.checkTeam(form.getTeamId());
-        if (teamcheck == false) {
-            throw new TeamNotFoundException("Team Not Found");
-        }
-        boolean teamMembercheck = dashboardService.checkTeamMember(form.getTeamId(), form.getUserId());
-        if (teamMembercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-
-//        //2. 그에 맞게 처리
-//        boolean check = dashboardService.checkDate(form.getDate()); //check==true일 경우 DB에 해당 date 존재
-//        if (check != true) {
-//            throw new DateNotFoundException("Date Not Found");
-//        }
-//        MinutesForm minutes = dashboardService.editMinutes(form.getDate(), form);
-
-//        //3. 수정한 회의록에 not null이 존재할 경우 오류 발생
-//        boolean formcheck = dashboardService.checkMinutesForm(minutes);
-//        if (formcheck == false) {
-//            throw new FormatBadRequestException("Fill In All");
-//        }
         Minutes2 minutes2 = dashboardService.findMinute(form.getTeamId(), form.getDate());
         MinutesForm dtotarget = dashboardService.editMinutes(minutes2, form);
 
@@ -192,28 +138,6 @@ public class CalendarController {
     //해당 날짜가 존재하지 않을 경우 오류 발생
     @DeleteMapping("/calendars/minutes/{teamId}/{userId}/{date}")
     public ResponseEntity<ResponseData> deleteMinutes(@PathVariable Long teamId,@PathVariable Long userId, @PathVariable String date) {
-        //1. 원하는 정보가 모두 들어오지 않았을 경우 오류 발생
-//        boolean formcheck = dashboardService.checkMinutesForm(form);
-//        if (formcheck == false) {
-//            throw new FormatBadRequestException("Fill In All");
-//        }
-
-        //2. teamId가 존재하는지 + 해당 team member에 사용자가 존재하는지
-        boolean teamcheck = dashboardService.checkTeam(teamId);
-        if (teamcheck == false) {
-            throw new TeamNotFoundException("Team Not Found");
-        }
-        boolean teamMembercheck = dashboardService.checkTeamMember(teamId, userId);
-        if (teamMembercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-
-        //3. 처리
-//        boolean check = dashboardService.checkDate(date); //check==true일 경우 DB에 해당 date 존재
-//        if (check != true) {
-//            throw new DateNotFoundException(String.format("Date[%s] Not Found", date));
-//        }
-//
 
         Minutes2 minutes2 = dashboardService.findMinute(teamId, date);
         dashboardService.deleteMinutes(minutes2);
@@ -224,26 +148,14 @@ public class CalendarController {
     //2: dashboard
     //2-1. project 생성
     @PostMapping("/dashboard/projects")
-    public ResponseEntity<ResponseData> createProjects(@RequestBody ProjectsForm form) {
+    public ResponseEntity<ResponseData> createProjects(@RequestBody ProjectsForm form) throws AlreadyExistException {
         //1. 원하는 정보가 모두 들어오지 않았을 경우 오류 발생
         boolean formcheck = dashboardService.checkProjectsForm(form);
         if (formcheck == false) {
             throw new FormatBadRequestException("Fill In All");
         }
 
-        //2. member table에 해당 id가 있는지 확인 + 교수가 맞는지 확인
-        boolean membercheck = dashboardService.checkMember(form.getProfessorId());
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-
-        String professorcheck = dashboardService.checkRole(form.getProfessorId());
-
-        if (!professorcheck.equals("professor")) {      //자바에서 문자열의 경우 ==이 아니라 equals 사용
-            throw new MemberNotFoundException("Not Professor");
-        }
-
-        //3. 동일한 projectName 존재 확인
+        //2. 동일한 projectName 존재 확인
         boolean check = dashboardService.checkProjectName(form.getProjectName());
 
         //(1)동일한 projectName이 존재하지 않을 경우, project 생성
@@ -254,31 +166,17 @@ public class CalendarController {
         }
         //(2).Projects2 DB에 해당 projectName 존재할 경우, 기존의 Projects2 보여줌
         else {
-            Projects2 original = dashboardService.getExistingProjects(form.getProjectName());
-            ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", original);
-            return new ResponseEntity<>(responseData, HttpStatus.OK);
+            throw new AlreadyExistException("Project Already Exist");
         }
     }
 
     //2-2. project 조회: 교수별로 => Dashboard:교수 기본 화면
     @GetMapping("/dashboard/projects/{professorId}")
     public ResponseEntity<ResponseData> watchProjects(@PathVariable Long professorId) {
-        //1. member table에 해당 id가 있는지 확인 + 교수가 맞는지 확인
-        boolean membercheck = dashboardService.checkMember(professorId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(professorId);
-        if (!professorcheck.equals("professor")) {
-            throw new MemberNotFoundException("Not Professor");
-        }
-
-        //2. 조회
         List<Projects2> projects2List = dashboardService.watchProjects(professorId);
         if (projects2List.isEmpty()) {
             return null;
         }
-
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -286,7 +184,6 @@ public class CalendarController {
     //2-3. project 수정
     @PatchMapping("/dashboard/projects")
     public ResponseEntity<ResponseData> editProject(@RequestBody ProjectsForm form) {
-        //입력에 원하는 정보가 들어왔는지 확인
         Projects2 projects = dashboardService.editProjects(form);
 
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects);
@@ -322,16 +219,6 @@ public class CalendarController {
         boolean formcheck = dashboardService.checkTeamsForm(form);
         if (formcheck == false) {
             throw new FormatBadRequestException("Fill In All");
-        }
-
-        //2. Members2 테이블에 존재하는지 + role이 학생인지 확인
-        boolean membercheck = dashboardService.checkMember(studentId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(studentId);
-        if (!professorcheck.equals("student")) {
-            throw new MemberNotFoundException("Not Student");
         }
 
         //3. 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
@@ -403,22 +290,6 @@ public class CalendarController {
     //2-4. team 조회: project 별로 모든 팀 조회=> 교수, Dashboard에서 프로젝트 클릭시
     @GetMapping("/dashboard/teamsByPro/{projectId}")
     public ResponseEntity<ResponseData> watchTeamsByPro(@PathVariable Long projectId) {
-//        //1. 교수인지 권한 확인
-//        boolean membercheck = dashboardService.checkMember(professorId);
-//        if (membercheck == false) {
-//            throw new MemberNotFoundException("Member Not Found");
-//        }
-//        String professorcheck = dashboardService.checkRole(professorId);
-//        if (!professorcheck.equals("professor")) {
-//            throw new MemberNotFoundException("Not Professor");
-//        }
-//        //2. 해당 프로젝트 생성자가 해당 professorId인지 확인
-//        boolean match = dashboardService.matchProfessorAndProject(professorId, projectId);
-//        if (match == false) {
-//            throw new ProjectNotFoundException("Matching Project Not Found");
-//        }
-
-        //3. 처리
         List<Teams2> teams2List = dashboardService.watchTeamsByPro(projectId);
         if (teams2List.isEmpty()) {
             return null;
@@ -434,17 +305,7 @@ public class CalendarController {
     //2-4. team 조회: 학생Id 별로 해당하는 모든 팀 조회 => 학생 기본 화면
     @GetMapping("/dashboard/teamsByStu/{id}")
     public ResponseEntity<ResponseData> watchTeamsByStu(@PathVariable Long id) {
-        //1. 해당 id가 member table에 존재하는지
-        boolean check = dashboardService.checkMember(id);
-        if (check == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        //2. 학생인지 권한 확인
-        String professorcheck = dashboardService.checkRole(id);
-        if (!professorcheck.equals("student")) {
-            throw new MemberNotFoundException("Not Professor");
-        }
-        //3. 처리
+
         List<Teams2> teams2List = dashboardService.watchTeamsByStu(id);
 
         //4. projectName과 semester도 같이 보내줌: teams2List에 projectId 존재. 해당 project의 정보(projectName, semester) 받아옴

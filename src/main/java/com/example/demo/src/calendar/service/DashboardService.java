@@ -205,14 +205,15 @@ public class DashboardService {
         return target;
     }
     @Transactional
-    public List<String> findMinuteByDate(Long teamId, String currentMonth) {
-        List<String> resultList = new ArrayList<>();
-        ArrayList<Minutes2> teamMinuteList = minutes2Repository.findByTeamId(teamId);
+    public List<Integer> findMinuteByDate(Long teamId, String currentMonth) {
+        List<Integer> resultList = new ArrayList<>();
+        List<Minutes2> teamMinuteList = minutes2Repository.findByTeamId(teamId);
         for (Minutes2 minutes2: teamMinuteList) {
             if (String.valueOf(minutes2.getDate()).startsWith(currentMonth)) {
                 String[] parts = minutes2.getDate().toString().split("-");
                 String lastDigit = parts[2];
-                resultList.add(lastDigit);
+                Integer date = Integer.valueOf(lastDigit);
+                resultList.add(date);
             }
         }
         return resultList;
