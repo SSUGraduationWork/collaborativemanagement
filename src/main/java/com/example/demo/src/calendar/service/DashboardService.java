@@ -2,6 +2,7 @@ package com.example.demo.src.calendar.service;
 
 import com.example.demo.src.calendar.dto.MinutesForm;
 import com.example.demo.src.calendar.dto.ProjectsForm;
+import com.example.demo.src.calendar.dto.TeamAndProjectForm;
 import com.example.demo.src.calendar.dto.TeamsForm;
 import com.example.demo.src.calendar.entity.*;
 import com.example.demo.src.calendar.repository.*;
@@ -94,6 +95,14 @@ public class DashboardService {
         return check;
     }
 
+    @Transactional
+    public boolean checkProjectIdAndTeamId(Long projectId, Long teamId) {
+        boolean check = false;
+        if (projects2Repository.findById(projectId) != null || teams2Repository.findById(teamId) != null) {
+            check = true;
+        }
+        return check;
+    }
     //2-3. 해당 project가 존재하는지: projectId로
     @Transactional
     public boolean checkProjectId(Long projectId) {
@@ -121,7 +130,17 @@ public class DashboardService {
         return check;
     }
 
+    @Transactional
+    public List<TeamAndProjectForm> getProjectAndTeam(List<Teams2> teams2List) {
+        List<TeamAndProjectForm> result = new ArrayList<>();
+        for (Teams2 teams2:teams2List) {
+            Projects2 projects2 = projects2Repository.findById(teams2.getProjectId()).orElse(null);
+            TeamAndProjectForm resultForm = new TeamAndProjectForm(teams2.getTeamId(), teams2.getProjectId(), teams2.getTeamName(), teams2.getTeamNumber(), projects2.getSemester(), projects2.getProjectName());
+            result.add(resultForm);
+        }
 
+        return result;
+    }
 
     //2-5. team에 해당 사용자가 존재하는지
     @Transactional
@@ -205,14 +224,15 @@ public class DashboardService {
         return target;
     }
     @Transactional
-    public List<String> findMinuteByDate(Long teamId, String currentMonth) {
-        List<String> resultList = new ArrayList<>();
-        ArrayList<Minutes2> teamMinuteList = minutes2Repository.findByTeamId(teamId);
+    public List<Integer> findMinuteByDate(Long teamId, String currentMonth) {
+        List<Integer> resultList = new ArrayList<>();
+        List<Minutes2> teamMinuteList = minutes2Repository.findByTeamId(teamId);
         for (Minutes2 minutes2: teamMinuteList) {
             if (String.valueOf(minutes2.getDate()).startsWith(currentMonth)) {
                 String[] parts = minutes2.getDate().toString().split("-");
                 String lastDigit = parts[2];
-                resultList.add(lastDigit);
+                Integer date = Integer.valueOf(lastDigit);
+                resultList.add(date);
             }
         }
         return resultList;
