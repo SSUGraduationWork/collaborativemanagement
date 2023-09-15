@@ -50,11 +50,6 @@ public class DashboardController {
     //2-1. project 생성
     @PostMapping("/dashboard/projects")
     public ResponseEntity<ResponseData> createProjects(@RequestBody ProjectsForm form) {
-        //1. 원하는 정보가 모두 들어오지 않았을 경우 오류 발생
-        boolean formcheck = dashboardService.checkProjectsForm(form);
-        if (formcheck == false) {
-            throw new FormatBadRequestException("Fill In All");
-        }
 
         //3. 동일한 projectName 존재 확인
         boolean check = dashboardService.checkProjectName(form.getProjectName());
@@ -85,7 +80,7 @@ public class DashboardController {
     }
 
     //2-3. project 수정
-    @PatchMapping("/dashboard/projects")
+    @PostMapping("/dashboard/project")
     public ResponseEntity<ResponseData> editProject(@RequestBody ProjectsForm form) {
         //입력에 원하는 정보가 들어왔는지 확인
         Projects2 projects = dashboardService.editProjects(form);
@@ -221,7 +216,7 @@ public class DashboardController {
     }
 
     //2-6. team 수정
-    @PatchMapping("/dashboard/teams")
+    @PostMapping("/dashboard/teams")
     public ResponseEntity<ResponseData> updateTeams(@RequestBody TeamsForm form) {
         Teams2 teams = dashboardService.editTeams(form);
 
