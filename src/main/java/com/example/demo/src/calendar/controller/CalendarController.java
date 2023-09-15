@@ -1,10 +1,7 @@
 package com.example.demo.src.calendar.controller;
 
 import com.example.demo.src.calendar.Exception.*;
-import com.example.demo.src.calendar.dto.MinutesForm;
-import com.example.demo.src.calendar.dto.ProjectsForm;
-import com.example.demo.src.calendar.dto.ResultForm;
-import com.example.demo.src.calendar.dto.TeamsForm;
+import com.example.demo.src.calendar.dto.*;
 import com.example.demo.src.calendar.entity.Minutes2;
 import com.example.demo.src.calendar.entity.Projects2;
 import com.example.demo.src.calendar.entity.Teams2;
@@ -292,12 +289,9 @@ public class CalendarController {
 
         List<Teams2> teams2List = dashboardService.watchTeamsByStu(id);
 
-        //4. projectName과 semester도 같이 보내줌: teams2List에 projectId 존재. 해당 project의 정보(projectName, semester) 받아옴
-        List<Projects2> projects2List = dashboardService.findProjectInfo(teams2List);
+        List<TeamAndProjectForm> form = dashboardService.getProjectAndTeam(teams2List);
 
-        ResultForm resultForm = new ResultForm(teams2List, null, projects2List);
-
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", form);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 

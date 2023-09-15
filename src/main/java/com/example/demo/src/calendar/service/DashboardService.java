@@ -2,6 +2,7 @@ package com.example.demo.src.calendar.service;
 
 import com.example.demo.src.calendar.dto.MinutesForm;
 import com.example.demo.src.calendar.dto.ProjectsForm;
+import com.example.demo.src.calendar.dto.TeamAndProjectForm;
 import com.example.demo.src.calendar.dto.TeamsForm;
 import com.example.demo.src.calendar.entity.*;
 import com.example.demo.src.calendar.repository.*;
@@ -129,7 +130,17 @@ public class DashboardService {
         return check;
     }
 
+    @Transactional
+    public List<TeamAndProjectForm> getProjectAndTeam(List<Teams2> teams2List) {
+        List<TeamAndProjectForm> result = new ArrayList<>();
+        for (Teams2 teams2:teams2List) {
+            Projects2 projects2 = projects2Repository.findById(teams2.getProjectId()).orElse(null);
+            TeamAndProjectForm resultForm = new TeamAndProjectForm(teams2.getTeamId(), teams2.getProjectId(), teams2.getTeamName(), teams2.getTeamNumber(), projects2.getSemester(), projects2.getProjectName());
+            result.add(resultForm);
+        }
 
+        return result;
+    }
 
     //2-5. team에 해당 사용자가 존재하는지
     @Transactional
