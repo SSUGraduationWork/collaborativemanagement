@@ -3,6 +3,7 @@ package com.example.demo.src.calendar.controller;
 import com.example.demo.src.calendar.Exception.*;
 import com.example.demo.src.calendar.dto.ProjectsForm;
 import com.example.demo.src.calendar.dto.ResultForm;
+import com.example.demo.src.calendar.dto.TeamAndProjectForm;
 import com.example.demo.src.calendar.dto.TeamsForm;
 import com.example.demo.src.calendar.entity.Projects2;
 import com.example.demo.src.calendar.entity.Teams2;
@@ -55,18 +56,6 @@ public class DashboardController {
             throw new FormatBadRequestException("Fill In All");
         }
 
-        //2. member table에 해당 id가 있는지 확인 + 교수가 맞는지 확인
-        boolean membercheck = dashboardService.checkMember(form.getProfessorId());
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-
-        String professorcheck = dashboardService.checkRole(form.getProfessorId());
-
-        if (!professorcheck.equals("professor")) {      //자바에서 문자열의 경우 ==이 아니라 equals 사용
-            throw new MemberNotFoundException("Not Professor");
-        }
-
         //3. 동일한 projectName 존재 확인
         boolean check = dashboardService.checkProjectName(form.getProjectName());
 
@@ -87,22 +76,10 @@ public class DashboardController {
     //2-2. project 조회: 교수별로 => Dashboard:교수 기본 화면
     @GetMapping("/dashboard/projects/{professorId}")
     public ResponseEntity<ResponseData> watchProjects(@PathVariable Long professorId) {
-        //1. member table에 해당 id가 있는지 확인 + 교수가 맞는지 확인
-        boolean membercheck = dashboardService.checkMember(professorId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(professorId);
-        if (!professorcheck.equals("professor")) {
-            throw new MemberNotFoundException("Not Professor");
-        }
-
-        //2. 조회
         List<Projects2> projects2List = dashboardService.watchProjects(professorId);
         if (projects2List.isEmpty()) {
             return null;
         }
-
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", projects2List);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -142,29 +119,14 @@ public class DashboardController {
     //2-3. team 생성 => 학생. Dashboard에서 생성할 것
     @PostMapping("/dashboard/teams/{studentId}")
     public ResponseEntity<ResponseData> createTeams(@RequestBody TeamsForm form, @PathVariable Long studentId) throws AlreadyExistException {
-        //1. Team form의 not null이 모두 들어왔는지 확인
-        boolean formcheck = dashboardService.checkTeamsForm(form);
-        if (formcheck == false) {
-            throw new FormatBadRequestException("Fill In All");
-        }
 
-        //2. Members2 테이블에 존재하는지 + role이 학생인지 확인
-        boolean membercheck = dashboardService.checkMember(studentId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(studentId);
-        if (!professorcheck.equals("student")) {
-            throw new MemberNotFoundException("Not Student");
-        }
-
-        //3. 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
+        // 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
         boolean check = dashboardService.checkProjectId(form.getProjectId()); //check==true일 경우 DB에 해당 date 존재
         if (check == false) {
             throw new ProjectNotFoundException("Project Not Found");
         }
 
-        //4. teamRepository에서 teamName이 겹치지 않는지 확인
+        // teamRepository에서 teamName이 겹치지 않는지 확인
         boolean checkTeamName = dashboardService.checkTeamName(form.getTeamName());
 
         if (checkTeamName == true) {
@@ -186,28 +148,18 @@ public class DashboardController {
     //2-5. 1) 학생이 보낸 URL(team으로 직접 들어올 경우) => team_number 1 증가 + project_number 1 증가
     @PatchMapping("/dashboard/{projectId}/{teamId}/{userId}")
     public ResponseEntity<ResponseData> countNumbers(@PathVariable Long projectId, @PathVariable Long teamId, @PathVariable Long userId) {
-        //1. Members2 테이블에 존재하는지 + role이 학생인지 확인
-        boolean membercheck = dashboardService.checkMember(userId);
-        if (membercheck == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        String professorcheck = dashboardService.checkRole(userId);
-        if (!professorcheck.equals("student")) {
-            throw new MemberNotFoundException("Not Student");
-        }
-
-        //2. 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
+        // 해당 projectId가 project table에 존재하는지 확인. 없으면 오류 발생 => ProjectNotFoundException
         boolean checkProject = dashboardService.checkProjectId(projectId); //check==true일 경우 DB에 해당 date 존재
         if (checkProject == false) {
             throw new ProjectNotFoundException("Project Not Found");
         }
-        //3. 해당 team이 존재하는지
+        // 해당 team이 존재하는지
         boolean checkTeam = dashboardService.checkTeam(teamId);
         if (checkTeam == false) {
             throw new TeamNotFoundException("Team Not Found");
         }
 
-        //4. 이미 멤버 테이블에 존재하는지 확인
+        // 이미 멤버 테이블에 존재하는지 확인
         boolean checkMember = dashboardService.checkTeamMember(teamId, userId);
         if (checkMember == false) {     //팀멤버 테이블에 존재하지 않는경우
             //1. 팀멤버 테이블에 추가
@@ -224,25 +176,10 @@ public class DashboardController {
         }
     }
 
+
     //2-4. team 조회: project 별로 모든 팀 조회=> 교수, Dashboard에서 프로젝트 클릭시
     @GetMapping("/dashboard/teamsByPro/{projectId}")
     public ResponseEntity<ResponseData> watchTeamsByPro(@PathVariable Long projectId) {
-//        //1. 교수인지 권한 확인
-//        boolean membercheck = dashboardService.checkMember(professorId);
-//        if (membercheck == false) {
-//            throw new MemberNotFoundException("Member Not Found");
-//        }
-//        String professorcheck = dashboardService.checkRole(professorId);
-//        if (!professorcheck.equals("professor")) {
-//            throw new MemberNotFoundException("Not Professor");
-//        }
-//        //2. 해당 프로젝트 생성자가 해당 professorId인지 확인
-//        boolean match = dashboardService.matchProfessorAndProject(professorId, projectId);
-//        if (match == false) {
-//            throw new ProjectNotFoundException("Matching Project Not Found");
-//        }
-
-        //3. 처리
         List<Teams2> teams2List = dashboardService.watchTeamsByPro(projectId);
         if (teams2List.isEmpty()) {
             return null;
@@ -258,25 +195,12 @@ public class DashboardController {
     //2-4. team 조회: 학생Id 별로 해당하는 모든 팀 조회 => 학생 기본 화면
     @GetMapping("/dashboard/teamsByStu/{id}")
     public ResponseEntity<ResponseData> watchTeamsByStu(@PathVariable Long id) {
-        //1. 해당 id가 member table에 존재하는지
-        boolean check = dashboardService.checkMember(id);
-        if (check == false) {
-            throw new MemberNotFoundException("Member Not Found");
-        }
-        //2. 학생인지 권한 확인
-        String professorcheck = dashboardService.checkRole(id);
-        if (!professorcheck.equals("student")) {
-            throw new MemberNotFoundException("Not Professor");
-        }
-        //3. 처리
+
         List<Teams2> teams2List = dashboardService.watchTeamsByStu(id);
 
-        //4. projectName과 semester도 같이 보내줌: teams2List에 projectId 존재. 해당 project의 정보(projectName, semester) 받아옴
-        List<Projects2> projects2List = dashboardService.findProjectInfo(teams2List);
+        List<TeamAndProjectForm> form = dashboardService.getProjectAndTeam(teams2List);
 
-        ResultForm resultForm = new ResultForm(teams2List, null, projects2List);
-
-        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
+        ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", form);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
@@ -290,11 +214,8 @@ public class DashboardController {
         }
 
         List<Teams2> resultTeamList = dashboardService.findTeamBySemester(teams2List, semester);
-        log.info("semesterResultForm: ", resultTeamList);
         List<Projects2> projects2List = dashboardService.findProjectInfo(resultTeamList);
-        log.info("semesterResultForm: ", projects2List);
         ResultForm resultForm = new ResultForm(resultTeamList, null, projects2List);
-        log.info("semesterResultForm: ", resultForm);
         ResponseData responseData = new ResponseData(HttpStatus.OK.value(), "Success", resultForm);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
