@@ -14,4 +14,5 @@ public class GetSocialOAuthRes {
     private String user_email;
 
     private String picture_url;
+    private String role;
 }

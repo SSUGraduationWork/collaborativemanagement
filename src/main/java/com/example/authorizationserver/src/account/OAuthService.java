@@ -62,10 +62,10 @@ public class OAuthService {
                         Long user_id = member.getId();
                         String role = member.getRole();
                         String jwtToken = jwtService.createJwt(user_id, role);
-                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(jwtToken, user_id, user_email, picture_url);
+                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(jwtToken, user_id, user_email, picture_url, role);
                         return getSocialOAuthRes;
                     } else {
-                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(null, null, user_email, picture_url);
+                        GetSocialOAuthRes getSocialOAuthRes = new GetSocialOAuthRes(null, null, user_email, picture_url, null);
                         return getSocialOAuthRes;
                     }
                 }
