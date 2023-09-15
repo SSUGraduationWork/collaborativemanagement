@@ -51,7 +51,7 @@ public class MemberService {
         String role = member.getRole();
 
         String jwtToken = jwtService.createJwt(id, role);
-        PostMemberRes postMemberRes = new PostMemberRes(jwtToken, id);
+        PostMemberRes postMemberRes = new PostMemberRes(jwtToken, id, role);
         return postMemberRes;
     }
 }

@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p FROM Project p LEFT JOIN Team t ON p.projectId = t.project.projectId WHERE p.professorId = :professorId AND t.teamId=:teamId")
     Optional<Project> findByProfessorIdAndTeamId(Long professorId, Long teamId);
+
+    @Query("SELECT p FROM Project p WHERE p.projectId = :projectId AND p.professorId = :professorId ")
+    Optional<Project> findByIdAndProfessorId(Long projectId, Long professorId);
 }

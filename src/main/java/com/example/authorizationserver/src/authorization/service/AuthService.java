@@ -9,6 +9,8 @@ import com.example.authorizationserver.src.repository.TeamMemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class AuthService {
@@ -45,7 +47,7 @@ public class AuthService {
         }
     }
 
-    //check permission for modification
+    //check permission for post modification
     public boolean checkModPermission(Long userId, Long boardId, String role){
         //학생인경우, 본인이 이 글의 작성자인지 확인
         if (role.equals("student")){
@@ -56,6 +58,25 @@ public class AuthService {
         } else{ //교수님은 팀 내에 게시글에 대한 수정, 삭제 권한이 없음.
             return false;
         }
+    }
+
+    //check permission for professor project
+    public boolean checkProfessorProject(Long userId, Long projectId){
+        //교수님인 경우, 해당 프로젝트가 교수님이 만든 프로젝트인지 확인
+        Optional<Project> project = projectRepository.findByIdAndProfessorId(projectId, userId);
+        if (project.isPresent()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //check permission for delete team
+    public boolean checkDeleteTeam(Long userId, Long teamId){
+        //이 팀이 교수님의 프로젝트에 속해있는지 확인
+        Project project = projectRepository.findByProfessorIdAndTeamId(userId, teamId)
+                .orElseThrow(IllegalAccessError::new);
+        return true;
     }
 
 }
