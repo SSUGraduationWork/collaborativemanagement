@@ -26,4 +26,19 @@ ex) [Fix] 버그 수정
 무엇을 구현 했는지 및 최대한 세세하게 적기
 * 참고 레퍼펀스
 
+### 기능
+
+`board-service` 
+`calendar-service` 
+`user-service` 
+`dashboard-service` 
+`work-service`
+
+- work-service는 Node.js이므로 아래 명령어로 실행
+
+```
+npm i
+npm start
+```
+
 ### 참고 링크
