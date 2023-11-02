@@ -41,4 +41,13 @@ npm i
 npm start
 ```
 
+### 웹 서비스
+|대시보드|작업|파일|
+|----|----|----|
+|<img width="1470" alt="대시보드1" src="https://github.com/SSUGraduationWork/collaborativemanagement/assets/125520029/b5e61b1b-2343-4fd7-9c6c-8003c850a490">|<img width="1470" alt="작업" src="https://github.com/SSUGraduationWork/collaborativemanagement/assets/125520029/2f7a84d8-a5b0-4543-adff-21bb0207c59c">|<img width="1470" alt="파일" src="https://github.com/SSUGraduationWork/collaborativemanagement/assets/125520029/48b9e13d-a42c-420a-8f08-0e84087ee958">|
+
+|캘린더|채팅|기여도|
+|----|----|----|
+|<img width="1470" alt="캘린더" src="https://github.com/SSUGraduationWork/collaborativemanagement/assets/125520029/67706a37-d8db-4478-aab0-4c9e91b2ca97">|<img width="1470" alt="채팅" src="https://github.com/SSUGraduationWork/collaborativemanagement/assets/125520029/08728c13-e4f7-465f-aad8-ddbb3c87f9a6">|<img width="1470" alt="기여도" src="https://github.com/SSUGraduationWork/collaborativemanagement/assets/125520029/b90888c7-2d3a-4e38-bdd9-0a6e4b42ba17">|
+
 ### 참고 링크
